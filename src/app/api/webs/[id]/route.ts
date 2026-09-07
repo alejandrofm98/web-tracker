@@ -1,13 +1,25 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { hasApiAccess } from "@/lib/access";
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+async function guard(req: Request) {
+  if (!(await hasApiAccess(req))) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  return null;
+}
+
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const denied = await guard(req);
+  if (denied) return denied;
   const web = await prisma.website.findUnique({ where: { id: params.id } });
   if (!web) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
   return NextResponse.json(web);
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
+  const denied = await guard(req);
+  if (denied) return denied;
   const body = await req.json().catch(() => ({}));
   const data: Record<string, unknown> = {};
   for (const k of [
@@ -36,7 +48,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  const denied = await guard(req);
+  if (denied) return denied;
   try {
     await prisma.website.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });

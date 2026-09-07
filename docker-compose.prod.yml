@@ -18,6 +18,7 @@ services:
       - SESSION_SECRET
       - TELEGRAM_BOT_TOKEN
       - TELEGRAM_CHAT_ID
+      - API_TOKEN
     networks:
       - default
       - dokploy-network

@@ -42,6 +42,38 @@ docker compose up -d --build
    contraseña (`curl -u usuario:contraseña https://tu-dominio/api/cron`).
 7. Pulsa "Probar aviso" en el panel para comprobar Telegram.
 
+## Uso por agentes IA (API con token)
+
+Define `API_TOKEN` en el `.env` (cadena larga aleatoria) y llama con
+`Authorization: Bearer TU-TOKEN`. Sin token devuelve 401.
+
+```bash
+BASE=https://web-tracker.walerike.com
+H="Authorization: Bearer TU-TOKEN"
+
+# Listar (filtros: ?q=texto, ?f=expiring|charges|bajas|todas)
+curl -H "$H" $BASE/api/webs
+
+# Crear (solo nombre y url obligatorios, resto opcional)
+curl -X POST -H "$H" -H "content-type: application/json" $BASE/api/webs -d '{
+  "name": "Mi Web", "url": "https://miweb.es",
+  "clientName": "Cliente", "domainProvider": "DonDominio",
+  "domainExpiresAt": "2027-01-15", "domainCost": 12,
+  "hostingProvider": "VPS", "clientPrice": 120,
+  "billingPeriod": "anual", "nextChargeAt": "2027-01-15",
+  "chargeStatus": "pendiente", "stack": "Next.js", "notes": "..."
+}'
+
+# Ver una, actualizar, marcar cobrado, borrar
+curl -H "$H" $BASE/api/webs/ID
+curl -X PUT -H "$H" -H "content-type: application/json" $BASE/api/webs/ID \
+  -d '{"chargeStatus": "cobrado"}'
+curl -X DELETE -H "$H" $BASE/api/webs/ID
+
+# Disparar revisión de avisos (también vale Basic Auth del login)
+curl -H "$H" $BASE/api/cron
+```
+
 ## Tests
 
 ```bash

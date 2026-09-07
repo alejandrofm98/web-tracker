@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { hasApiAccess } from "@/lib/access";
 
 const DAY = 86400000;
 
+async function guard(req: Request) {
+  if (!(await hasApiAccess(req))) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  return null;
+}
+
 export async function GET(req: Request) {
+  const denied = await guard(req);
+  if (denied) return denied;
   const { searchParams } = new URL(req.url);
   const q = (searchParams.get("q") ?? "").trim();
   const f = searchParams.get("f") ?? "";
@@ -36,6 +46,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard(req);
+  if (denied) return denied;
   const body = await req.json().catch(() => ({}));
   const name = String(body.name ?? "").trim();
   const url = String(body.url ?? "").trim();
