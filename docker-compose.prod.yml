@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webtracker.rule=Host(`tracker.TU-DOMINIO.es`)"
+      - "traefik.http.routers.webtracker.entrypoints=websecure"
+      - "traefik.http.routers.webtracker.tls.certresolver=letsencrypt"
+      - "traefik.http.services.webtracker.loadbalancer.server.port=3000"
+    env_file: .env
+    environment:
+      - DATABASE_URL
+      - ADMIN_USER
+      - ADMIN_PASSWORD
+      - SESSION_SECRET
+      - TELEGRAM_BOT_TOKEN
+      - TELEGRAM_CHAT_ID
+      - CRON_SECRET
+    networks:
+      - default
+      - dokploy-network
+
+networks:
+  default: {}
+  dokploy-network:
+    external: true

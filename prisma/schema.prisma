@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Website {
+  id               String    @id @default(cuid())
+  name             String
+  url              String
+  clientName       String    @default("")
+  clientContact    String    @default("")
+  status           String    @default("activa")
+  domainProvider   String    @default("")
+  domainExpiresAt  DateTime?
+  domainCost       Float?
+  domainAutoRenew  Boolean   @default(false)
+  hostingProvider  String    @default("")
+  hostingPlan      String    @default("")
+  ownCost          Float?
+  clientPrice      Float?
+  billingPeriod    String    @default("anual")
+  nextChargeAt     DateTime?
+  chargeStatus     String    @default("pendiente")
+  stack            String    @default("")
+  repoUrl          String    @default("")
+  credentialsHint  String    @default("")
+  notes            String    @default("")
+  lastNotifiedAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
