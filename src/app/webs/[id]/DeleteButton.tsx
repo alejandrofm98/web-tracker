@@ -9,6 +9,7 @@ export default function DeleteButton({ id }: { id: string }) {
 
   return (
     <button
+      className="btn-danger-ghost"
       onClick={async () => {
         if (!confirm("¿Eliminar esta web?")) return;
         setLoading(true);
@@ -17,14 +18,6 @@ export default function DeleteButton({ id }: { id: string }) {
         router.refresh();
       }}
       disabled={loading}
-      style={{
-        background: "transparent",
-        color: "oklch(0.65 0.18 25)",
-        border: "1px solid oklch(0.65 0.18 25)",
-        borderRadius: 8,
-        padding: "8px 14px",
-        cursor: "pointer",
-      }}
     >
       {loading ? "Eliminando…" : "Eliminar"}
     </button>

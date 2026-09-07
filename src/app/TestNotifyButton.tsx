@@ -9,6 +9,7 @@ export default function TestNotifyButton() {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <button
+        className="btn-ghost"
         onClick={async () => {
           setLoading(true);
           setMsg("");
@@ -23,18 +24,10 @@ export default function TestNotifyButton() {
           }
         }}
         disabled={loading}
-        style={{
-          background: "transparent",
-          color: "oklch(0.70 0.008 260)",
-          border: "1px solid oklch(0.34 0.008 260)",
-          borderRadius: 8,
-          padding: "8px 14px",
-          cursor: loading ? "wait" : "pointer",
-        }}
       >
         {loading ? "Comprobando…" : "Probar aviso"}
       </button>
-      {msg && <span style={{ fontSize: 12, color: "oklch(0.70 0.008 260)" }}>{msg}</span>}
+      {msg && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{msg}</span>}
     </span>
   );
 }

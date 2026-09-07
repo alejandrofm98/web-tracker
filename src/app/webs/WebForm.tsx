@@ -68,184 +68,158 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
     (initial?.[k] as string | undefined) ?? fallback;
 
   return (
-    <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 720 }}>
-      <Section title="Básicos">
-        <Field label="Nombre *">
-          <input name="name" required defaultValue={v("name")} style={input} />
-        </Field>
-        <Field label="URL *">
-          <input name="url" required defaultValue={v("url")} placeholder="https://…" style={input} />
-        </Field>
-        <div style={row}>
-          <Field label="Cliente">
-            <input name="clientName" defaultValue={v("clientName")} style={input} />
-          </Field>
-          <Field label="Contacto cliente">
-            <input name="clientContact" defaultValue={v("clientContact")} style={input} />
-          </Field>
+    <form onSubmit={onSubmit} style={{ maxWidth: 860 }}>
+      <section className="panel">
+        <h2 className="panel-title">Básicos</h2>
+        <div className="form-grid">
+          <label className="field">
+            <span>Nombre *</span>
+            <input name="name" required defaultValue={v("name")} className="input" />
+          </label>
+          <label className="field">
+            <span>URL *</span>
+            <input name="url" required defaultValue={v("url")} placeholder="https://…" className="input" />
+          </label>
+          <label className="field">
+            <span>Estado</span>
+            <select name="status" defaultValue={v("status", "activa")} className="input">
+              <option value="activa">activa</option>
+              <option value="pendiente">pendiente</option>
+              <option value="baja">baja</option>
+            </select>
+          </label>
+          <label className="field">
+            <span>Cliente</span>
+            <input name="clientName" defaultValue={v("clientName")} className="input" />
+          </label>
+          <label className="field">
+            <span>Contacto cliente</span>
+            <input name="clientContact" defaultValue={v("clientContact")} className="input" />
+          </label>
         </div>
-        <Field label="Estado">
-          <select name="status" defaultValue={v("status", "activa")} style={input}>
-            <option value="activa">activa</option>
-            <option value="pendiente">pendiente</option>
-            <option value="baja">baja</option>
-          </select>
-        </Field>
-      </Section>
+      </section>
 
-      <Section title="Dominio">
-        <div style={row}>
-          <Field label="Proveedor">
-            <input name="domainProvider" defaultValue={v("domainProvider")} style={input} />
-          </Field>
-          <Field label="Caduca">
+      <section className="panel">
+        <h2 className="panel-title">Dominio</h2>
+        <div className="form-grid">
+          <label className="field">
+            <span>Proveedor</span>
+            <input name="domainProvider" defaultValue={v("domainProvider")} className="input" />
+          </label>
+          <label className="field">
+            <span>Caduca</span>
             <input
               type="date"
               name="domainExpiresAt"
               defaultValue={inputDateValue(initial?.domainExpiresAt ?? null)}
-              style={input}
+              className="input"
             />
-          </Field>
-        </div>
-        <div style={row}>
-          <Field label="Coste renovación (€)">
+          </label>
+          <label className="field">
+            <span>Coste renovación (€)</span>
             <input
               type="number"
               step="0.01"
               name="domainCost"
               defaultValue={initial?.domainCost ?? ""}
-              style={input}
+              className="input"
             />
-          </Field>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, paddingTop: 22 }}>
-            <input type="checkbox" name="domainAutoRenew" defaultChecked={initial?.domainAutoRenew ?? false} />
-            Auto-renovación
           </label>
         </div>
-      </Section>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginTop: 12 }}>
+          <input type="checkbox" name="domainAutoRenew" defaultChecked={initial?.domainAutoRenew ?? false} />
+          Auto-renovación activada
+        </label>
+      </section>
 
-      <Section title="Hosting y cobros">
-        <div style={row}>
-          <Field label="Proveedor hosting">
-            <input name="hostingProvider" defaultValue={v("hostingProvider")} style={input} />
-          </Field>
-          <Field label="Plan">
-            <input name="hostingPlan" defaultValue={v("hostingPlan")} style={input} />
-          </Field>
-        </div>
-        <div style={row}>
-          <Field label="Me cuesta (€)">
-            <input type="number" step="0.01" name="ownCost" defaultValue={initial?.ownCost ?? ""} style={input} />
-          </Field>
-          <Field label="Le cobro (€)">
+      <section className="panel">
+        <h2 className="panel-title">Hosting y cobros</h2>
+        <div className="form-grid">
+          <label className="field">
+            <span>Proveedor hosting</span>
+            <input name="hostingProvider" defaultValue={v("hostingProvider")} className="input" />
+          </label>
+          <label className="field">
+            <span>Plan</span>
+            <input name="hostingPlan" defaultValue={v("hostingPlan")} className="input" />
+          </label>
+          <label className="field">
+            <span>Periodicidad</span>
+            <select name="billingPeriod" defaultValue={v("billingPeriod", "anual")} className="input">
+              <option value="mensual">mensual</option>
+              <option value="anual">anual</option>
+            </select>
+          </label>
+          <label className="field">
+            <span>Me cuesta (€)</span>
+            <input type="number" step="0.01" name="ownCost" defaultValue={initial?.ownCost ?? ""} className="input" />
+          </label>
+          <label className="field">
+            <span>Le cobro (€)</span>
             <input
               type="number"
               step="0.01"
               name="clientPrice"
               defaultValue={initial?.clientPrice ?? ""}
-              style={input}
+              className="input"
             />
-          </Field>
-        </div>
-        <div style={row}>
-          <Field label="Periodicidad">
-            <select name="billingPeriod" defaultValue={v("billingPeriod", "anual")} style={input}>
-              <option value="mensual">mensual</option>
-              <option value="anual">anual</option>
-            </select>
-          </Field>
-          <Field label="Próximo cobro">
+          </label>
+          <label className="field">
+            <span>Próximo cobro</span>
             <input
               type="date"
               name="nextChargeAt"
               defaultValue={inputDateValue(initial?.nextChargeAt ?? null)}
-              style={input}
+              className="input"
             />
-          </Field>
-          <Field label="Estado cobro">
-            <select name="chargeStatus" defaultValue={v("chargeStatus", "pendiente")} style={input}>
+          </label>
+          <label className="field">
+            <span>Estado cobro</span>
+            <select name="chargeStatus" defaultValue={v("chargeStatus", "pendiente")} className="input">
               <option value="pendiente">pendiente</option>
               <option value="cobrado">cobrado</option>
             </select>
-          </Field>
+          </label>
         </div>
-      </Section>
+      </section>
 
-      <Section title="Técnico y notas">
-        <div style={row}>
-          <Field label="Stack">
-            <input name="stack" defaultValue={v("stack")} style={input} />
-          </Field>
-          <Field label="Repo">
-            <input name="repoUrl" defaultValue={v("repoUrl")} placeholder="https://…" style={input} />
-          </Field>
+      <section className="panel">
+        <h2 className="panel-title">Técnico y notas</h2>
+        <div className="form-grid">
+          <label className="field">
+            <span>Stack</span>
+            <input name="stack" defaultValue={v("stack")} className="input" />
+          </label>
+          <label className="field">
+            <span>Repo</span>
+            <input name="repoUrl" defaultValue={v("repoUrl")} placeholder="https://…" className="input" />
+          </label>
+          <label className="field">
+            <span>Dónde están las credenciales</span>
+            <input
+              name="credentialsHint"
+              defaultValue={v("credentialsHint")}
+              placeholder="Pista, nunca passwords"
+              className="input"
+            />
+          </label>
         </div>
-        <Field label="Dónde están las credenciales (pista, nunca passwords)">
-          <input name="credentialsHint" defaultValue={v("credentialsHint")} style={input} />
-        </Field>
-        <Field label="Notas">
-          <textarea name="notes" defaultValue={v("notes")} rows={4} style={input} />
-        </Field>
-      </Section>
+        <label className="field" style={{ display: "block", marginTop: 12 }}>
+          <span>Notas</span>
+          <textarea name="notes" defaultValue={v("notes")} rows={4} className="input" />
+        </label>
+      </section>
 
       {error && (
-        <p role="alert" style={{ color: "oklch(0.65 0.18 25)", fontSize: 13, margin: 0 }}>
+        <p role="alert" className="form-error">
           {error}
         </p>
       )}
-      <div>
-        <button type="submit" disabled={loading} style={primaryBtn}>
+      <div style={{ marginTop: 16 }}>
+        <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear web"}
         </button>
       </div>
     </form>
   );
 }
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section
-      style={{
-        border: "1px solid oklch(0.34 0.008 260)",
-        borderRadius: 10,
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      }}
-    >
-      <h2 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: "oklch(0.70 0.008 260)" }}>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label style={{ fontSize: 13, flex: 1, minWidth: 0 }}>
-      {label}
-      <span style={{ display: "block", marginTop: 4 }}>{children}</span>
-    </label>
-  );
-}
-
-const row: React.CSSProperties = { display: "flex", gap: 12, flexWrap: "wrap" };
-const input: React.CSSProperties = {
-  width: "100%",
-  background: "oklch(0.21 0.008 260)",
-  border: "1px solid oklch(0.34 0.008 260)",
-  borderRadius: 8,
-  padding: "9px 12px",
-  color: "inherit",
-  boxSizing: "border-box",
-  fontSize: 14,
-};
-const primaryBtn: React.CSSProperties = {
-  background: "oklch(0.72 0.14 230)",
-  color: "oklch(0.21 0.008 260)",
-  border: 0,
-  borderRadius: 8,
-  padding: "10px 18px",
-  fontWeight: 700,
-  cursor: "pointer",
-};

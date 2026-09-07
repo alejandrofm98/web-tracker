@@ -10,6 +10,7 @@
   --text: oklch(0.93 0.005 260);
   --text-muted: oklch(0.7 0.008 260);
   --accent: oklch(0.72 0.14 230);
+  --accent-ink: oklch(0.21 0.008 260);
   --danger: oklch(0.65 0.18 25);
   --warning: oklch(0.78 0.14 80);
   --success: oklch(0.75 0.15 150);
@@ -30,6 +31,10 @@ body {
 
 a {
   color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 input,
@@ -37,6 +42,7 @@ select,
 textarea,
 button {
   font: inherit;
+  color: inherit;
 }
 
 :focus-visible {
@@ -44,13 +50,422 @@ button {
   outline-offset: 2px;
 }
 
-table {
-  border-collapse: collapse;
+/* ---------- App shell ---------- */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }
 
-@media (max-width: 720px) {
-  main {
-    padding: 16px !important;
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  background: var(--bg-raised);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px 12px;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 16px;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.navlink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.navlink:hover {
+  background: var(--bg-overlay);
+  color: var(--text);
+  text-decoration: none;
+}
+.navlink.active {
+  background: var(--bg-overlay);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 28px 48px;
+  max-width: 1120px;
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.toolbar h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 auto 0 0;
+}
+
+.statusline {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+/* ---------- Controls ---------- */
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+a.btn-primary:hover {
+  text-decoration: none;
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+a.btn-ghost:hover {
+  text-decoration: none;
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.input,
+select.input,
+textarea.input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.search {
+  max-width: 280px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.chip {
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.chip:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+/* ---------- Data table ---------- */
+
+.tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-raised);
+}
+
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+table.grid thead th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+table.grid tbody td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+table.grid tbody tr:first-child td {
+  border-top: 0;
+}
+table.grid tbody tr:hover {
+  background: var(--bg-overlay);
+}
+
+.cell-main {
+  font-weight: 600;
+  color: var(--text);
+}
+.cell-sub {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  display: inline-block;
+  margin-right: 7px;
+  vertical-align: 1px;
+}
+
+/* ---------- Forms ---------- */
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  padding: 18px;
+}
+.panel + .panel {
+  margin-top: 16px;
+}
+.panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.field {
+  font-size: 13px;
+  min-width: 0;
+}
+.field > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-muted);
+}
+
+/* ---------- Login ---------- */
+
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--text);
+}
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+}
+.login-card h1 {
+  font-size: 18px;
+  margin: 12px 0 4px;
+}
+.login-card p {
+  margin: 0 0 20px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+.login-card .field + .field {
+  margin-top: 12px;
+}
+.login-card .btn-primary {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 14px;
+}
+.form-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+/* ---------- Empty state ---------- */
+
+.empty {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.empty p {
+  margin: 0 0 16px;
+}
+
+.backlink {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.page-sub {
+  margin: 0 0 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.row-between {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.row-between > :last-child {
+  margin-left: auto;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 860px) {
+  .shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: auto;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 12px;
+    overflow-x: auto;
+  }
+  .brand {
+    padding: 0 8px 0 0;
+  }
+  .brand-sub {
+    display: none;
+  }
+  .navlink {
+    white-space: nowrap;
+  }
+  .sidebar-foot {
+    margin: 0 0 0 auto;
+    border: 0;
+    padding: 0;
+  }
+  .content {
+    padding: 16px 16px 40px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 }
 

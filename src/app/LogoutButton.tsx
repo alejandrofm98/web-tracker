@@ -6,18 +6,12 @@ export default function LogoutButton() {
   const router = useRouter();
   return (
     <button
+      className="btn-ghost"
+      style={{ marginLeft: "auto", padding: "6px 12px", fontSize: 12.5 }}
       onClick={async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         router.push("/login");
         router.refresh();
-      }}
-      style={{
-        background: "transparent",
-        color: "oklch(0.70 0.008 260)",
-        border: "1px solid oklch(0.34 0.008 260)",
-        borderRadius: 8,
-        padding: "8px 14px",
-        cursor: "pointer",
       }}
     >
       Salir

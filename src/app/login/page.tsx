@@ -34,87 +34,36 @@ export default function LoginPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "oklch(0.21 0.008 260)",
-        color: "oklch(0.93 0.005 260)",
-        padding: 16,
-      }}
-    >
-      <form
-        onSubmit={onSubmit}
-        style={{
-          width: "100%",
-          maxWidth: 360,
-          background: "oklch(0.25 0.009 260)",
-          border: "1px solid oklch(0.34 0.008 260)",
-          borderRadius: 10,
-          padding: 24,
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-        }}
-      >
-        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Web Tracker</h1>
-        <p style={{ margin: 0, color: "oklch(0.70 0.008 260)", fontSize: 14 }}>
-          Acceso privado. Introduce tus credenciales.
-        </p>
-        <label style={{ fontSize: 13 }}>
-          Usuario
-          <input
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            autoComplete="username"
-            style={inputStyle}
-          />
+    <main className="login-wrap">
+      <form onSubmit={onSubmit} className="login-card">
+        <span className="brand-mark" style={{ width: 36, height: 36, fontSize: 17 }}>
+          W
+        </span>
+        <h1>Web Tracker</h1>
+        <p>Acceso privado. Introduce tus credenciales.</p>
+        <label className="field">
+          <span>Usuario</span>
+          <input value={user} onChange={(e) => setUser(e.target.value)} autoComplete="username" className="input" />
         </label>
-        <label style={{ fontSize: 13 }}>
-          Contraseña
+        <label className="field">
+          <span>Contraseña</span>
           <input
             type="password"
             value={pass}
             onChange={(e) => setPass(e.target.value)}
             autoComplete="current-password"
-            style={inputStyle}
+            className="input"
           />
         </label>
         {error && (
-          <p role="alert" style={{ color: "oklch(0.65 0.18 25)", fontSize: 13, margin: 0 }}>
+          <p role="alert" className="form-error">
             {error}
           </p>
         )}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            background: "oklch(0.72 0.14 230)",
-            color: "oklch(0.21 0.008 260)",
-            border: 0,
-            borderRadius: 8,
-            padding: "10px 14px",
-            fontWeight: 700,
-            cursor: loading ? "wait" : "pointer",
-          }}
-        >
+        <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "Entrando…" : "Entrar"}
         </button>
       </form>
     </main>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  marginTop: 4,
-  background: "oklch(0.21 0.008 260)",
-  border: "1px solid oklch(0.34 0.008 260)",
-  borderRadius: 8,
-  padding: "9px 12px",
-  color: "inherit",
-  boxSizing: "border-box",
-};
