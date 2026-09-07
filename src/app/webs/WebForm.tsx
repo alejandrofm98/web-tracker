@@ -178,6 +178,7 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
             <select name="chargeStatus" defaultValue={v("chargeStatus", "pendiente")} className="input">
               <option value="pendiente">pendiente</option>
               <option value="cobrado">cobrado</option>
+              <option value="sin-cobro">No se cobra</option>
             </select>
           </label>
         </div>

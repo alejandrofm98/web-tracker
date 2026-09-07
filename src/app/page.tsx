@@ -196,11 +196,13 @@ export default async function Home({
                           {dueLabel2(dDom)} <span className="cell-sub">· {fmtDate(w.domainExpiresAt)}</span>
                         </td>
                         <td style={{ whiteSpace: "nowrap" }}>
-                          <span className={`dot d-${w.chargeStatus === "cobrado" || dCob === null || dCob >= 30 ? "ok" : "warn"}`} />
+                          <span className={`dot d-${w.chargeStatus === "pendiente" && dCob !== null && dCob < 30 ? "warn" : "ok"}`} />
                           {w.chargeStatus === "cobrado"
                             ? "cobrado"
-                            : `${dueLabel2(dCob)} `}
-                          {w.chargeStatus !== "cobrado" && (
+                            : w.chargeStatus === "sin-cobro"
+                              ? "no se cobra"
+                              : `${dueLabel2(dCob)} `}
+                          {w.chargeStatus === "pendiente" && (
                             <span className="cell-sub">· {fmtDate(w.nextChargeAt)}</span>
                           )}
                         </td>
