@@ -4,7 +4,7 @@
 
 **Goal:** Panel personal Next.js + Postgres + Telegram que trackea webs, dominios y cobros con login propio y despliegue Dokploy.
 
-**Architecture:** Next.js App Router monolitico, Prisma contra Postgres, cron diario interno + endpoint `/api/cron` con `CRON_SECRET`, avisos via Telegram Bot API fetch directo.
+**Architecture:** Next.js App Router monolitico, Prisma contra Postgres, cron diario interno + endpoint `/api/cron` con Basic Auth (ADMIN_USER/ADMIN_PASSWORD) o sesion, avisos via Telegram Bot API fetch directo.
 
 **Tech Stack:** Next.js 14 (App Router, TS), Prisma 5, PostgreSQL 16, node-cron, Docker multi-stage, Dokploy + Traefik.
 
@@ -15,7 +15,7 @@
 - No guardar passwords de terceros en claro, solo pista de donde estan.
 - UI oscuro con caracter segun DESIGN.md (OKLCH, Inter/system, tabla densa, sin cards genericas ni gradientes).
 - Despliegue con docker-compose.yml local y docker-compose.prod.yml estilo pistas-deportivas-backend (Traefik + dokploy-network externa).
-- Env requeridas: DATABASE_URL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, CRON_SECRET.
+- Env requeridas: DATABASE_URL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
 
 ---
 
@@ -95,7 +95,7 @@ ADMIN_PASSWORD=cambia-esto
 SESSION_SECRET=cambia-esto-32-chars-minimo
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
-CRON_SECRET=cambia-esto
+
 ```
 
 - [ ] **Step 5: Escribir Dockerfile multi-stage**
@@ -185,7 +185,7 @@ services:
       - SESSION_SECRET
       - TELEGRAM_BOT_TOKEN
       - TELEGRAM_CHAT_ID
-      - CRON_SECRET
+
     networks:
       - default
       - dokploy-network
@@ -394,7 +394,7 @@ export async function sendTelegram(text: string) {
 }
 ```
 
-`/api/cron`: exige `?secret=CRON_SECRET` o header, busca webs con domainExpiresAt / nextChargeAt en TARGETS, manda mensajes, actualiza lastNotifiedAt para no duplicar el mismo dia. Incluye boton en UI que hace fetch a /api/cron para "probar aviso".
+`/api/cron`: exige Basic Auth con ADMIN_USER/ADMIN_PASSWORD o sesion iniciada, busca webs con domainExpiresAt / nextChargeAt en TARGETS, manda mensajes, actualiza lastNotifiedAt para no duplicar el mismo dia. Incluye boton en UI que hace fetch a /api/cron para "probar aviso".
 
 `instrumentation.ts`: registra node-cron diario 09:00 que llama a la misma logica.
 

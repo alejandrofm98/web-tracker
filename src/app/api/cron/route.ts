@@ -4,12 +4,22 @@ import { checkExpirations } from "@/lib/check";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const secret = searchParams.get("secret") ?? req.headers.get("authorization")?.replace(/^Bearer /i, "");
-  const bySecret = Boolean(process.env.CRON_SECRET && secret === process.env.CRON_SECRET);
+  const auth = req.headers.get("authorization") ?? "";
+  let byBasic = false;
+  if (auth.toLowerCase().startsWith("basic ")) {
+    try {
+      const decoded = Buffer.from(auth.slice(6).trim(), "base64").toString("utf-8");
+      const idx = decoded.indexOf(":");
+      const user = decoded.slice(0, idx);
+      const pass = decoded.slice(idx + 1);
+      byBasic = user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASSWORD;
+    } catch {
+      byBasic = false;
+    }
+  }
 
   let bySession = false;
-  if (!bySecret) {
+  if (!byBasic) {
     const token = cookies().get(SESSION_COOKIE)?.value;
     if (token) {
       try {
@@ -21,7 +31,7 @@ export async function GET(req: Request) {
     }
   }
 
-  if (!bySecret && !bySession) {
+  if (!byBasic && !bySession) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

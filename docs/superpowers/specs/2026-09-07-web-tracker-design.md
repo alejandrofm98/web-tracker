@@ -12,7 +12,7 @@ No es multi-cliente. Solo acceso admin.
 ## 2. Arquitectura
 - Next.js App Router (TypeScript) + Prisma ORM + PostgreSQL 16
 - Todo en un solo proyecto / una sola app Docker
-- Cron interno diario 09:00 (node-cron o similar) + endpoint `/api/cron` protegible con `CRON_SECRET`
+- Cron interno diario 09:00 (node-cron o similar)  + endpoint `/api/cron` protegido con tu usuario y contraseña (Basic Auth) o sesion
   para usar el cron de Dokploy como alternativa
 - Avisos via Telegram Bot API (fetch directo, sin dependencias pesadas)
 - Auth propia simple: `ADMIN_USER` / `ADMIN_PASSWORD` en .env, sesión en cookie httpOnly,
@@ -54,14 +54,14 @@ queries de fechas fiables para los avisos 30/15/7/1.
 - `docker-compose.prod.yml`: solo app, labels Traefik, red externa `dokploy-network`,
   `DATABASE_URL` viene de la Postgres de Dokploy
 - `.env.example` con: DATABASE_URL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET,
-  TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, CRON_SECRET
+  TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 - HTTPS vía Traefik + letsencrypt (lo pone Dokploy)
 
 ## 7. Seguridad
 - Todo tras login. Sin registro público
 - Password admin en .env (idealmente hash, mínimo env)
 - Cookie httpOnly, secure en prod
-- `/api/cron` exige `CRON_SECRET` si se llama desde fuera
+- `/api/cron` exige tu usuario y contraseña (Basic Auth) si se llama desde fuera
 
 ## 8. Fuera de alcance v1 (YAGNI)
 - Acceso para clientes, multi-usuario, roles
