@@ -6,7 +6,7 @@ services:
       - "3000"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.webtracker.rule=Host(`tracker.TU-DOMINIO.es`)"
+      - "traefik.http.routers.webtracker.rule=Host(`web-tracker.walerike.com`)"
       - "traefik.http.routers.webtracker.entrypoints=websecure"
       - "traefik.http.routers.webtracker.tls.certresolver=letsencrypt"
       - "traefik.http.services.webtracker.loadbalancer.server.port=3000"
