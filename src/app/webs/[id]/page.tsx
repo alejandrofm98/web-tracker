@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import Shell from "../../Shell";
 import WebForm from "../WebForm";
 import DeleteButton from "./DeleteButton";
+import ChargeButton from "../../ChargeButton";
 
 export const revalidate = 0;
 
@@ -17,7 +18,10 @@ export default async function DetailPage({ params }: { params: { id: string } })
         <Link href="/" className="backlink" style={{ marginBottom: 0 }}>
           ← Volver
         </Link>
-        <DeleteButton id={web.id} />
+        <span style={{ display: "flex", gap: 10 }}>
+          {web.chargeStatus === "pendiente" && <ChargeButton id={web.id} />}
+          <DeleteButton id={web.id} />
+        </span>
       </div>
       <h1 className="page-title" style={{ marginTop: 12 }}>
         {web.name}
