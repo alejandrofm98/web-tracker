@@ -68,7 +68,7 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
     (initial?.[k] as string | undefined) ?? fallback;
 
   return (
-    <form onSubmit={onSubmit} style={{ maxWidth: 860 }}>
+    <form onSubmit={onSubmit} className="form-shell">
       <section className="panel">
         <h2 className="panel-title">Básicos</h2>
         <div className="form-grid">
@@ -215,10 +215,13 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
           {error}
         </p>
       )}
-      <div style={{ marginTop: 16 }}>
+      <div className="form-actions">
         <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear web"}
         </button>
+        <a href={isEdit ? `/webs/${initial!.id}` : "/"} className="cancel">
+          Cancelar
+        </a>
       </div>
     </form>
   );
