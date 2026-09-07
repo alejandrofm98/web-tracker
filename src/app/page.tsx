@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { daysUntil, statusFor } from "@/lib/dates";
 import { fmtDate, fmtMoney } from "@/lib/format";
 import LogoutButton from "./LogoutButton";
+import TestNotifyButton from "./TestNotifyButton";
 
 export const revalidate = 0;
 
@@ -91,6 +92,7 @@ export default async function Home({
         <a href="/webs/nueva" style={primaryBtn}>
           + Nueva web
         </a>
+        <TestNotifyButton />
         <LogoutButton />
       </header>
 
