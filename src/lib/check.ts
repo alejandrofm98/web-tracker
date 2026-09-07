@@ -26,12 +26,12 @@ export async function checkExpirations(now = new Date()): Promise<CheckResult> {
 
     if (dueIn(dDom) && dDom !== null) {
       const when = dDom === 0 ? "hoy" : `en ${dDom} días`;
-      msgs.push(`⚠️ <b>${w.name}</b> (${w.url}) — el dominio caduca <b>${when}</b> (${fmtDate(w.domainExpiresAt)})`);
+      msgs.push(`⚠️ <b>${w.name}</b> (${w.url}): el dominio caduca <b>${when}</b> (${fmtDate(w.domainExpiresAt)})`);
     }
     if (dueIn(dCob) && dCob !== null) {
       const when = dCob === 0 ? "hoy" : `en ${dCob} días`;
       msgs.push(
-        `💰 <b>${w.name}</b> — toca cobrar hosting a ${w.clientName || "cliente"} (${fmtMoney(w.clientPrice)}) <b>${when}</b> (${fmtDate(w.nextChargeAt)})`
+        `💰 <b>${w.name}</b>: toca cobrar hosting a ${w.clientName || "cliente"} (${fmtMoney(w.clientPrice)}) <b>${when}</b> (${fmtDate(w.nextChargeAt)})`
       );
     }
     if (msgs.length === 0) continue;
