@@ -1,101 +1,202 @@
-import Image from "next/image";
+import { prisma } from "@/lib/db";
+import { daysUntil, statusFor } from "@/lib/dates";
+import { fmtDate, fmtMoney } from "@/lib/format";
+import LogoutButton from "./LogoutButton";
 
-export default function Home() {
+export const revalidate = 0;
+
+const C = {
+  bg: "oklch(0.21 0.008 260)",
+  raised: "oklch(0.25 0.009 260)",
+  border: "oklch(0.34 0.008 260)",
+  text: "oklch(0.93 0.005 260)",
+  muted: "oklch(0.70 0.008 260)",
+  accent: "oklch(0.72 0.14 230)",
+  danger: "oklch(0.65 0.18 25)",
+  warning: "oklch(0.78 0.14 80)",
+  success: "oklch(0.75 0.15 150)",
+};
+
+function Badge({ days, label }: { days: number | null; label?: string }) {
+  const s = statusFor(days);
+  const color = s === "crit" ? C.danger : s === "warn" ? C.warning : C.success;
+  const text = days === null ? "sin fecha" : days < 0 ? `caducó hace ${-days}d` : days === 0 ? "hoy" : `${days}d`;
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 12,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <span style={{ width: 8, height: 8, borderRadius: 99, background: color }} />
+      <span>
+        {label ? `${label}: ` : ""}
+        {text}
+      </span>
+    </span>
   );
 }
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { q?: string; f?: string };
+}) {
+  const q = (searchParams.q ?? "").trim();
+  const f = searchParams.f ?? "";
+  const DAY = 86400000;
+
+  const where: Record<string, unknown> = {};
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { url: { contains: q, mode: "insensitive" } },
+      { clientName: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (f === "expiring") where.domainExpiresAt = { lte: new Date(Date.now() + 30 * DAY) };
+  else if (f === "charges") where.chargeStatus = "pendiente";
+  else if (f === "bajas") where.status = "baja";
+  else if (!f) where.NOT = { status: "baja" };
+
+  const webs = await prisma.website.findMany({
+    where,
+    orderBy: [{ domainExpiresAt: "asc" }, { nextChargeAt: "asc" }],
+  });
+
+  const filters: Array<[string, string]> = [
+    ["", "Todas"],
+    ["expiring", "Caducan <30d"],
+    ["charges", "Cobros pendientes"],
+    ["bajas", "Bajas"],
+    ["todas", "Incluir bajas"],
+  ];
+
+  return (
+    <main style={{ background: C.bg, color: C.text, minHeight: "100vh", padding: "20px 24px", fontSize: 14 }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, marginRight: "auto" }}>Web Tracker</h1>
+        <form action="/" style={{ display: "flex", gap: 8 }}>
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Buscar web, cliente…"
+            style={searchStyle}
+          />
+          {f && <input type="hidden" name="f" value={f} />}
+        </form>
+        <a href="/webs/nueva" style={primaryBtn}>
+          + Nueva web
+        </a>
+        <LogoutButton />
+      </header>
+
+      <nav style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        {filters.map(([v, label]) => {
+          const active = (v === "" && !f) || v === f;
+          const href = v ? `/?f=${v}${q ? `&q=${encodeURIComponent(q)}` : ""}` : q ? `/?q=${encodeURIComponent(q)}` : "/";
+          return (
+            <a
+              key={label}
+              href={href}
+              style={{
+                ...chipStyle,
+                background: active ? C.accent : "transparent",
+                color: active ? C.bg : C.muted,
+                fontWeight: active ? 700 : 400,
+              }}
+            >
+              {label}
+            </a>
+          );
+        })}
+      </nav>
+
+      {webs.length === 0 ? (
+        <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 32, textAlign: "center" }}>
+          <p style={{ margin: "0 0 12px" }}>No hay webs aquí todavía.</p>
+          <a href="/webs/nueva" style={primaryBtn}>
+            Añade tu primera web
+          </a>
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ textAlign: "left", color: C.muted, fontSize: 12 }}>
+                <th style={th}>Web</th>
+                <th style={th}>Cliente</th>
+                <th style={th}>Dominio</th>
+                <th style={th}>Cobro</th>
+                <th style={th}>Precio</th>
+                <th style={th}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {webs.map((w) => {
+                const dDom = daysUntil(w.domainExpiresAt);
+                const dCob = daysUntil(w.nextChargeAt);
+                return (
+                  <tr key={w.id} style={{ borderTop: `1px solid ${C.border}` }}>
+                    <td style={td}>
+                      <a href={`/webs/${w.id}`} style={{ color: C.text, fontWeight: 600 }}>
+                        {w.name}
+                      </a>
+                      <div style={{ color: C.muted, fontSize: 12 }}>{w.url}</div>
+                    </td>
+                    <td style={td}>{w.clientName || "—"}</td>
+                    <td style={td}>
+                      <Badge days={dDom} />{" "}
+                      <span style={{ color: C.muted }}>{fmtDate(w.domainExpiresAt)}</span>
+                    </td>
+                    <td style={td}>
+                      <Badge days={dCob} label={w.chargeStatus} />{" "}
+                      <span style={{ color: C.muted }}>{fmtDate(w.nextChargeAt)}</span>
+                    </td>
+                    <td style={td}>{fmtMoney(w.clientPrice)}</td>
+                    <td style={{ ...td, textAlign: "right", whiteSpace: "nowrap" }}>
+                      <a href={`/webs/${w.id}`} style={{ color: C.accent }}>
+                        Abrir
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </main>
+  );
+}
+
+const th: React.CSSProperties = { padding: "8px 10px", fontWeight: 600 };
+const td: React.CSSProperties = { padding: "10px", verticalAlign: "top" };
+const searchStyle: React.CSSProperties = {
+  background: "oklch(0.25 0.009 260)",
+  border: "1px solid oklch(0.34 0.008 260)",
+  borderRadius: 8,
+  padding: "8px 12px",
+  color: "inherit",
+  minWidth: 200,
+};
+const primaryBtn: React.CSSProperties = {
+  background: "oklch(0.72 0.14 230)",
+  color: "oklch(0.21 0.008 260)",
+  borderRadius: 8,
+  padding: "8px 14px",
+  fontWeight: 700,
+  textDecoration: "none",
+  display: "inline-block",
+};
+const chipStyle: React.CSSProperties = {
+  border: "1px solid oklch(0.34 0.008 260)",
+  borderRadius: 99,
+  padding: "6px 12px",
+  fontSize: 13,
+  textDecoration: "none",
+  color: "oklch(0.70 0.008 260)",
+};
