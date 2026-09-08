@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
 export default function DeleteButton({ id }: { id: string }) {
   const router = useRouter();
@@ -9,7 +10,9 @@ export default function DeleteButton({ id }: { id: string }) {
 
   return (
     <button
-      className="btn-danger-ghost"
+      className="icon-btn danger"
+      title="Eliminar"
+      aria-label="Eliminar"
       onClick={async () => {
         if (!confirm("¿Eliminar esta web?")) return;
         setLoading(true);
@@ -19,7 +22,7 @@ export default function DeleteButton({ id }: { id: string }) {
       }}
       disabled={loading}
     >
-      {loading ? "Eliminando…" : "Eliminar"}
+      <Trash2 size={15} />
     </button>
   );
 }

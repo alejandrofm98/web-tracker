@@ -1,13 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
-export default function LogoutButton() {
+export default function LogoutButton({ icon }: { icon?: boolean }) {
   const router = useRouter();
+  if (icon) {
+    return (
+      <button
+        className="icon-btn"
+        title="Salir"
+        aria-label="Salir"
+        onClick={async () => {
+          await fetch("/api/auth/logout", { method: "POST" });
+          router.push("/login");
+          router.refresh();
+        }}
+      >
+        <LogOut size={16} />
+      </button>
+    );
+  }
   return (
     <button
       className="btn-ghost"
-      style={{ marginLeft: "auto", padding: "6px 12px", fontSize: 12.5 }}
       onClick={async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         router.push("/login");

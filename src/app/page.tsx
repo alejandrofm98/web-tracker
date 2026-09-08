@@ -1,3 +1,4 @@
+import { ArrowUpRight, Plus } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { daysUntil } from "@/lib/dates";
 import { fmtDate, fmtMoney } from "@/lib/format";
@@ -22,7 +23,6 @@ type Urgent = {
   id: string;
   webId: string;
   name: string;
-  url: string;
   clientName: string;
   provider: string;
   kind: "dominio" | "cobro";
@@ -40,7 +40,6 @@ function buildUrgent(webs: Awaited<ReturnType<typeof prisma.website.findMany>>):
         id: `${w.id}-dom`,
         webId: w.id,
         name: w.name,
-        url: w.url,
         clientName: w.clientName,
         provider: w.domainProvider,
         kind: "dominio",
@@ -56,7 +55,6 @@ function buildUrgent(webs: Awaited<ReturnType<typeof prisma.website.findMany>>):
           id: `${w.id}-cob`,
           webId: w.id,
           name: w.name,
-          url: w.url,
           clientName: w.clientName,
           provider: w.hostingProvider,
           kind: "cobro",
@@ -71,14 +69,20 @@ function buildUrgent(webs: Awaited<ReturnType<typeof prisma.website.findMany>>):
   return out;
 }
 
-function pillClass(days: number): "crit" | "warn" {
-  return days < 7 ? "crit" : "warn";
-}
-
 function dueLabel(days: number): string {
   if (days < 0) return `${-days}d tarde`;
   if (days === 0) return "hoy";
   return `${days}d`;
+}
+
+function idx(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function pillFor(days: number | null): string {
+  if (days === null || days >= 30) return "pill-ok";
+  if (days < 7) return "pill-crit";
+  return "pill-warn";
 }
 
 export default async function Home({
@@ -115,116 +119,118 @@ export default async function Home({
   const hrefFor = (v: string) =>
     v ? `/?f=${v}${q ? `&q=${encodeURIComponent(q)}` : ""}` : q ? `/?q=${encodeURIComponent(q)}` : "/";
 
+  let n = 0;
+
   return (
     <Shell>
-      <div className="toolbar">
-        <h1>Webs</h1>
-        <form action="/">
-          <input name="q" defaultValue={q} placeholder="Buscar web, cliente…" className="input search" />
-          {f && <input type="hidden" name="f" value={f} />}
-        </form>
-        <a href="/webs/nueva" className="btn-primary">
-          + Nueva web
-        </a>
-        <TestNotifyButton />
-      </div>
+      <p className="ed-kicker">
+        Panel · {webs.length} {webs.length === 1 ? "web" : "webs"}
+      </p>
 
       {webs.length === 0 ? (
         <div className="empty" style={{ marginTop: 16 }}>
           <p>No hay webs aquí todavía.</p>
           <a href="/webs/nueva" className="btn-primary">
-            Añade tu primera web
+            <Plus size={15} /> Añade tu primera web
           </a>
         </div>
       ) : (
         <>
           {urgent.length > 0 && (
-            <div className="digest">
-              <div className="digest-h">
-                <span className="dot d-crit" /> Requiere atención
+            <>
+              <h1 className="ed-title">Qué necesita atención</h1>
+              <div style={{ marginBottom: 30 }}>
+                {urgent.map((u) => {
+                  n += 1;
+                  return (
+                    <div key={u.id} className="ed-row">
+                      <span className="ed-idx">{idx(n)}</span>
+                      <h3>
+                        <a href={`/webs/${u.webId}`}>{u.name}</a>
+                      </h3>
+                      <span className="ed-meta">
+                        <span className={`pill pill-${u.days < 7 ? "crit" : "warn"}`}>
+                          {u.kind} · {dueLabel(u.days)}
+                        </span>
+                        <span className="cell-sub">
+                          {u.kind === "cobro"
+                            ? `${fmtMoney(u.price)} · ${u.clientName || ""}`
+                            : `${fmtDate(u.date)}${u.provider ? ` · ${u.provider}` : ""}`}
+                        </span>
+                        {u.kind === "cobro" && <ChargeButton id={u.webId} compact />}
+                        <a
+                          href={`/webs/${u.webId}`}
+                          className="icon-btn"
+                          title="Abrir ficha"
+                          aria-label={`Abrir ${u.name}`}
+                        >
+                          <ArrowUpRight size={15} />
+                        </a>
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              {urgent.map((u) => (
-                <div key={u.id} className="digest-item">
-                  <span className={`pill pill-${pillClass(u.days)}`}>{dueLabel(u.days)}</span>
-                  <span style={{ minWidth: 0 }}>
-                    <a href={`/webs/${u.webId}`} className="name">
-                      {u.name}
-                    </a>{" "}
-                    <span className="sub">
-                      {u.kind === "cobro"
-                        ? `cobro hosting · ${fmtMoney(u.price)} · ${fmtDate(u.date)}`
-                        : `caduca dominio · ${fmtDate(u.date)}${u.provider ? ` · ${u.provider}` : ""}`}
-                    </span>
-                  </span>
-                  <span className="sub" style={{ marginLeft: "auto", whiteSpace: "nowrap" }}>
-                    {u.kind === "cobro" ? u.clientName || "" : ""}
-                  </span>
-                  {u.kind === "cobro" && <ChargeButton id={u.webId} compact />}
-                </div>
-              ))}
-            </div>
+            </>
           )}
 
-          {calm.length > 0 ? (
-            <div className="tablewrap">
-              <table className="grid">
-                <thead>
-                  <tr>
-                    <th>Web</th>
-                    <th>Cliente</th>
-                    <th>Dominio</th>
-                    <th>Cobro</th>
-                    <th style={{ textAlign: "right" }}>Precio</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calm.map((w) => {
-                    const dDom = daysUntil(w.domainExpiresAt);
-                    const dCob = daysUntil(w.nextChargeAt);
-                    return (
-                      <tr key={w.id}>
-                        <td>
-                          <a href={`/webs/${w.id}`} className="cell-main">
-                            {w.name}
-                          </a>
-                          <div className="cell-sub">{w.url}</div>
-                        </td>
-                        <td>{w.clientName || <span className="cell-sub">—</span>}</td>
-                        <td style={{ whiteSpace: "nowrap" }}>
-                          <span className={`dot d-${dDom !== null && dDom < 30 ? "warn" : "ok"}`} />
-                          {dueLabel2(dDom)} <span className="cell-sub">· {fmtDate(w.domainExpiresAt)}</span>
-                        </td>
-                        <td style={{ whiteSpace: "nowrap" }}>
-                          <span className={`dot d-${w.chargeStatus === "pendiente" && dCob !== null && dCob < 30 ? "warn" : "ok"}`} />
-                          {w.chargeStatus === "cobrado"
-                            ? "cobrado"
-                            : w.chargeStatus === "sin-cobro"
-                              ? "no se cobra"
-                              : `${dueLabel2(dCob)} `}
-                          {w.chargeStatus === "pendiente" && (
-                            <span className="cell-sub">· {fmtDate(w.nextChargeAt)}</span>
-                          )}
-                        </td>
-                        <td style={{ textAlign: "right" }}>{fmtMoney(w.clientPrice)}</td>
-                        <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                          <a href={`/webs/${w.id}`}>Abrir</a>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="statusline" style={{ marginTop: 4 }}>
-              El resto, al día.
-            </p>
+          {calm.length > 0 && (
+            <>
+              <h2 className="ed-title" style={{ fontSize: 30 }}>
+                En orden
+              </h2>
+              <div>
+                {calm.map((w) => {
+                  n += 1;
+                  const dDom = daysUntil(w.domainExpiresAt);
+                  const dCob = daysUntil(w.nextChargeAt);
+                  const next =
+                    dDom !== null && (dCob === null || dDom <= dCob)
+                      ? { label: "dominio", days: dDom, date: w.domainExpiresAt }
+                      : { label: "cobro", days: dCob, date: w.nextChargeAt };
+                  return (
+                    <div key={w.id} className="ed-row">
+                      <span className="ed-idx">{idx(n)}</span>
+                      <h3>
+                        <a href={`/webs/${w.id}`}>{w.name}</a>
+                      </h3>
+                      <span className="ed-meta">
+                        <span className={`pill ${pillFor(next.days)}`}>
+                          {next.label} · {dueLabel2(next.days)}
+                        </span>
+                        <span className="cell-sub">
+                          {w.clientName || fmtDate(next.date)}
+                        </span>
+                        <a
+                          href={`/webs/${w.id}`}
+                          className="icon-btn"
+                          title="Abrir ficha"
+                          aria-label={`Abrir ${w.name}`}
+                        >
+                          <ArrowUpRight size={15} />
+                        </a>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </>
       )}
 
-      <nav className="chips" style={{ marginTop: 20 }}>
+      <div className="toolbar">
+        <form action="/">
+          <input name="q" defaultValue={q} placeholder="Buscar web, cliente…" className="input search" />
+          {f && <input type="hidden" name="f" value={f} />}
+        </form>
+        <a href="/webs/nueva" className="btn-primary">
+          <Plus size={15} /> Nueva web
+        </a>
+        <TestNotifyButton />
+      </div>
+
+      <nav className="chips">
         {FILTERS.map(([v, label]) => {
           const active = (v === "" && !f) || v === f;
           return (

@@ -1,48 +1,45 @@
-# Design System — Web Tracker
+# Design System — Web Tracker (Noche editorial)
 
 ## Theme
-Dark-first functional. Escena: Alejandro revisa vencimientos en el portatil por la noche entre despliegues, luz baja, quiere escanear rapido sin fatiga. Fondo oscuro neutro tintado, texto alto contraste, un solo acento para accion y alertas semanticas separadas.
+Dark-first editorial. Escena: Alejandro revisa vencimientos en el portatil por la noche entre despliegues, luz baja, como quien lee un periodico: titulares serif grandes, indice numerado, datos mono. Fondo marron oscuro calido, texto crema, un solo acento ambar.
 
 ## Colors
-Uso OKLCH, neutros tintados hacia azul frio (chroma 0.008), nunca #000 ni #fff puros.
-Estrategia: Restrained (neutros + un acento <=10%) + semanticos de estado.
+Uso OKLCH, neutros tintados hacia marron calido, nunca #000 ni #fff puros.
+Estrategia: Restrained (neutros + un acento ambar) + semanticos de estado.
 
-- `--bg`: oklch(0.21 0.008 260) — superficie base
-- `--bg-raised`: oklch(0.25 0.009 260) — sidebar, toolbar
-- `--bg-overlay`: oklch(0.28 0.01 260) — dropdowns, modales
-- `--border`: oklch(0.34 0.008 260) — bordes 1px completos, nunca side-stripe >1px
-- `--text`: oklch(0.93 0.005 260)
-- `--text-muted`: oklch(0.70 0.008 260)
-- `--accent`: oklch(0.72 0.14 230) — acciones primarias, seleccion actual. Solo ahi.
-- `--danger`: oklch(0.65 0.18 25) — <7 dias / impagado
-- `--warning`: oklch(0.78 0.14 80) — <30 dias / pendiente
-- `--success`: oklch(0.75 0.15 150) — al dia / cobrado
-- `--info`: oklch(0.72 0.12 250)
+- `--bg`: oklch(0.21 0.02 70) — superficie base
+- `--bg-raised`: oklch(0.25 0.022 70) — topbar, paneles, digest
+- `--bg-overlay`: oklch(0.29 0.024 70) — hover filas
+- `--border`: oklch(0.36 0.03 70) — bordes 1px completos, nunca side-stripe >1px
+- `--text`: oklch(0.93 0.012 80)
+- `--text-muted`: oklch(0.72 0.025 70)
+- `--accent`: oklch(0.80 0.13 75) — ambar. Acciones primarias, kickers, indices. Solo ahi.
+- `--danger`: oklch(0.68 0.17 25) — <7 dias / impagado
+- `--warning`: oklch(0.80 0.13 80) — <30 dias / pendiente
+- `--success`: oklch(0.74 0.13 150) — al dia / cobrado
 
-Sin gradientes decorativos. Sin gradient-text. Estado con punto + texto de dias, no solo color.
+Sin gradientes decorativos (solo un radial calido estatico en el login). Sin gradient-text. Estado con pildora mono + texto de dias, no solo color.
 
 ## Typography
-- Familia: Inter, fallback `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`. Una sola familia para todo, sin display font en labels/botones/datos.
-- Escala fija rem, ratio 1.125–1.2: 12 / 14 / 16 / 20 / 24. H1 24 en listado, nada fluido con clamp.
-- Cuerpo 14px, tablas densas 13px. Prosa (notas) max 70ch. Tablas pueden llegar a 120ch+.
-- Jerarquia por peso + escala, no por color.
+- Display: Fraunces (serif) para titulares de pagina, nombres de web en filas indice y titulos de seccion. Fallback Georgia.
+- Cuerpo/UI: Inter, fallback system-ui. Una sola sans para todo lo funcional.
+- Datos: JetBrains Mono para pildoras de dias, indices 01/02/03 y cifras de atencion. Fallback ui-monospace.
+- Titulares 30-60px serif; cuerpo 14px; tablas 13px. Prosa max 70ch.
 
 ## Spacing & Layout
-- App shell: sidebar izquierda (nav: Webs, Avisos, Ajustes) + topbar con buscador + contenido. Sidebar colapsable en movil.
-- Listado como tabla densa, no grid de cards identicas. Fila = web con columnas: estado, nombre/url, cliente, dominio (dias), cobro (dias), acciones.
-- Ritmo variado: 8 / 12 / 16 / 24, no mismo padding en todo.
-- Sin cards anidadas. La mayoria de bloques sin contenedor innecesario.
+- Topbar fina fija (marca + 2 links + usuario) en vez de sidebar: el producto cabe en 3 vistas.
+- Contenido centrado max 960px. Listado como indice editorial numerado, no tabla generica.
+- Formularios centrados max 880px, secciones en paneles, barra de acciones fija abajo.
+- Ficha en dos columnas: hechos (dl) + acciones/historial.
 
 ## Components
-- Botones: primario (accent), secundario (borde 1px), danger. Estados: default, hover, focus visible, active, disabled, loading (skeleton, no spinner central).
-- Inputs: fondo raised, borde 1px, foco con anillo accent 2px. Error con mensaje + borde danger.
-- Tabla: header sticky, zebra sutil, fila hover, skeleton rows al cargar.
-- Empty state que ensena: "Anade tu primera web" + CTA, no "nada aqui".
-- Badges de estado: punto + texto ("7d", "cobrado"), fondo tintado 12%.
-- Toasts para confirmar crear/cobrar/probar Telegram.
+- Acciones como iconos (lucide, 15-16px): abrir, cobrar, editar, borrar, salir, probar aviso. Solo el CTA primario lleva texto.
+- Pildoras mono de estado: punto + texto ("7d", "cobrado"), fondo tintado.
+- Inputs oscuros con foco en acento, selects con flecha propia.
+- Empty state que ensena. Toasts via texto inline en botones (probar aviso).
 
 ## Motion
-- 150–200ms, ease-out-quart/quint. Solo para cambio de estado, feedback, reveal. Nada de secuencias de carga orquestadas. Respeta prefers-reduced-motion. Nunca animar layout properties.
+- Sin animacion decorativa. Transiciones instantaneas o 150ms en hover. Respeta prefers-reduced-motion.
 
 ## Radius & Elevation
-- Radius 8px botones/inputs, 10px paneles. Sombras minimas en oscuro (elevacion por tono, no por sombra).
+- Radius 8px botones/inputs/iconos, 10-12px paneles. Elevacion por tono, no por sombra.

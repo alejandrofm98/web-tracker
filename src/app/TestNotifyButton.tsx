@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BellRing } from "lucide-react";
 
 export default function TestNotifyButton() {
   const [msg, setMsg] = useState("");
@@ -9,7 +10,9 @@ export default function TestNotifyButton() {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <button
-        className="btn-ghost"
+        className="icon-btn"
+        title="Probar aviso"
+        aria-label="Probar aviso"
         onClick={async () => {
           setLoading(true);
           setMsg("");
@@ -25,7 +28,7 @@ export default function TestNotifyButton() {
         }}
         disabled={loading}
       >
-        {loading ? "Comprobando…" : "Probar aviso"}
+        <BellRing size={15} />
       </button>
       {msg && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{msg}</span>}
     </span>

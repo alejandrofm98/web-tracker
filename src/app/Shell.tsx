@@ -11,29 +11,30 @@ const NAV = [
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const inDetail = pathname.startsWith("/webs/") && pathname !== "/webs/nueva";
   return (
     <div className="shell">
-      <aside className="sidebar">
-        <div className="brand">
+      <header className="topbar">
+        <Link href="/" className="brand" style={{ color: "var(--text)" }}>
           <span className="brand-mark">W</span>
-          <span>
-            <span className="brand-name">Web Tracker</span>
-            <br />
-            <span className="brand-sub">Dominios y cobros</span>
-          </span>
-        </div>
-        <nav style={{ display: "contents" }}>
+          <span className="brand-name">Web Tracker</span>
+        </Link>
+        <nav className="topnav">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className={`navlink${n.match(pathname) ? " active" : ""}`}>
+            <Link
+              key={n.href}
+              href={n.href}
+              className={`navlink${n.match(pathname) || (n.href === "/" && inDetail) ? " active" : ""}`}
+            >
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className="sidebar-foot">
-          <span style={{ color: "var(--text-muted)" }}>admin</span>
-          <LogoutButton />
+        <div className="topbar-user">
+          <span>admin</span>
+          <LogoutButton icon />
         </div>
-      </aside>
+      </header>
       <div className="content">{children}</div>
     </div>
   );
