@@ -66,8 +66,10 @@ docker compose up -d --build
 Las fuentes están incluidas en `src/app/fonts` con sus licencias OFL. El build
 no necesita descargar fuentes de Google.
 
-En Oracle Cloud, mantén permitidos TCP 80 y 443 para Traefik. No necesitas
-reglas públicas para 3002 ni 5438: ambos se publican solo en loopback.
+En Oracle Cloud, mantén permitidos TCP 80 y 443 para Traefik. La app usa la
+URL interna de PostgreSQL de Dokploy (puerto 5432). El puerto externo de esa
+base es 5438; no hace falta abrirlo en Oracle para que funcione el tracker.
+El frontend se publica solo en loopback, en el puerto 3002.
 
 ### Diagnóstico del 404
 
