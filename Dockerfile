@@ -15,9 +15,10 @@ FROM node:22-alpine AS run
 WORKDIR /app
 RUN apk add --no-cache openssl
 ENV NODE_ENV=production
+ENV PORT=3002
 COPY --from=build /app/package.json /app/package-lock.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/prisma ./prisma
-EXPOSE 3000
+EXPOSE 3002
 CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

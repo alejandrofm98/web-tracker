@@ -1,5 +1,6 @@
 node_modules
 .next
 .git
-.env
+.env*
+.idea
 postgres_data

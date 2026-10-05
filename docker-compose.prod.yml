@@ -1,24 +1,62 @@
 services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tracker
+      POSTGRES_USER: tracker
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configura POSTGRES_PASSWORD en Dokploy}
+    ports:
+      - "127.0.0.1:5438:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tracker -d tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   app:
     build: .
     restart: unless-stopped
     expose:
-      - "3000"
+      - "3002"
+    ports:
+      - "127.0.0.1:3002:3002"
+    depends_on:
+      db:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.webtracker.rule=Host(`web-tracker.walerike.com`)"
       - "traefik.http.routers.webtracker.entrypoints=websecure"
+      - "traefik.http.routers.webtracker.service=webtracker"
+      - "traefik.http.routers.webtracker.tls=true"
       - "traefik.http.routers.webtracker.tls.certresolver=letsencrypt"
-      - "traefik.http.services.webtracker.loadbalancer.server.port=3000"
-    env_file: .env
+      - "traefik.http.services.webtracker.loadbalancer.server.port=3002"
+      - "traefik.http.routers.webtracker-http.rule=Host(`web-tracker.walerike.com`)"
+      - "traefik.http.routers.webtracker-http.entrypoints=web"
+      - "traefik.http.routers.webtracker-http.service=webtracker"
+      - "traefik.http.routers.webtracker-http.middlewares=webtracker-https"
+      - "traefik.http.middlewares.webtracker-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.webtracker-https.redirectscheme.permanent=true"
     environment:
-      - DATABASE_URL
-      - ADMIN_USER
-      - ADMIN_PASSWORD
-      - SESSION_SECRET
-      - TELEGRAM_BOT_TOKEN
-      - TELEGRAM_CHAT_ID
-      - API_TOKEN
+      DATABASE_URL: ${DATABASE_URL:?Configura DATABASE_URL con host db y puerto 5432}
+      ADMIN_USER: ${ADMIN_USER:?Configura ADMIN_USER en Dokploy}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Configura ADMIN_PASSWORD en Dokploy}
+      SESSION_SECRET: ${SESSION_SECRET:?Configura SESSION_SECRET en Dokploy}
+      API_TOKEN: ${API_TOKEN:?Configura API_TOKEN en Dokploy}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      TZ: Europe/Madrid
+      PORT: "3002"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3002/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     networks:
       - default
       - dokploy-network
@@ -27,3 +65,6 @@ networks:
   default: {}
   dokploy-network:
     external: true
+
+volumes:
+  postgres_data:
