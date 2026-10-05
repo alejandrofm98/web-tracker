@@ -34,18 +34,13 @@ docker compose up -d --build
 
 ## Despliegue en Dokploy
 
-1. El Compose de producción incluye Postgres con un volumen persistente
-   `postgres_data`. Configura `POSTGRES_PASSWORD` con una contraseña aleatoria
-   (por ejemplo, `openssl rand -hex 32`) y `DATABASE_URL` como
-   `postgresql://tracker:TU_PASSWORD@db:5432/tracker?schema=public`. Usa la misma
-   contraseña en ambas variables; si contiene caracteres especiales, debes
-   codificarlos para la URL. Dentro de Docker se usa `db:5432`; desde el servidor
-   se usa `127.0.0.1:5438`.
+1. Crea PostgreSQL en Dokploy y configura DATABASE_URL con su URL interna.
+   El servicio db de docker-compose.yml es solo local.
 2. Crea un servicio **Docker Compose** desde este repositorio (no Docker Stack)
    y selecciona **`docker-compose.prod.yml`** como Compose Path. El fichero
    `docker-compose.yml` es solo para desarrollo local y no configura Traefik.
 3. Define en Environment de Dokploy `DATABASE_URL`, `ADMIN_USER`,
-   `ADMIN_PASSWORD`, `SESSION_SECRET`, `API_TOKEN` y `POSTGRES_PASSWORD`. Las seis son obligatorias.
+   `ADMIN_PASSWORD`, `SESSION_SECRET` y `API_TOKEN`. Las cinco son obligatorias.
    Usa secretos aleatorios diferentes para sesión y API; puedes generar cada
    uno con `openssl rand -hex 32`. Telegram es opcional: `TELEGRAM_BOT_TOKEN`
    y `TELEGRAM_CHAT_ID`.
@@ -58,8 +53,7 @@ docker compose up -d --build
 5. El DNS de `web-tracker.walerike.com` debe apuntar al servidor de Dokploy.
    Las etiquetas asumen los entrypoints estándar `web` / `websecure` y el
    resolver `letsencrypt`. Si tu Traefik usa otros nombres, adapta las etiquetas.
-6. El frontend se publica en `127.0.0.1:3002` y la base en
-   `127.0.0.1:5438`, sin exponer Postgres a internet. Traefik accede al frontend
+6. El frontend se publica en `127.0.0.1:3002`. La base la gestiona Dokploy. Traefik accede al frontend
    por la red Docker. Despliega. Prisma aplica las migraciones pendientes al arrancar. La app
    estará saludable cuando `/api/health` devuelva `200 {"status":"ok"}`;
    devuelve 503 si no puede conectar con Postgres.
