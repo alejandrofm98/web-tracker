@@ -36,20 +36,15 @@ export default function LoginPage() {
 
   return (
     <main className="login-wrap">
-      <div className="login-left">
-        <h1>
-          Tus webs,
-          <br />
-          <em>al día.</em>
-        </h1>
-        <p>Dominios, cobros y vencimientos de un vistazo. Sin ruido.</p>
-      </div>
+      <a className="brand login-brand" href="/" style={{ color: "var(--text)" }}><span className="brand-mark">W</span><span className="brand-name">Web Tracker</span></a>
       <div className="login-right">
         <form onSubmit={onSubmit} className="login-card">
-          <p className="ed-kicker">Acceso privado</p>
+          <p className="ed-kicker">Tu espacio privado</p>
+          <h1>Entra en Web Tracker</h1>
+          <p className="login-subtitle">Retoma el control de tus webs.</p>
           <label className="field">
             <span>Usuario</span>
-            <input value={user} onChange={(e) => setUser(e.target.value)} autoComplete="username" className="input" />
+            <input value={user} onChange={(e) => setUser(e.target.value)} required autoComplete="username" className="input" />
           </label>
           <label className="field">
             <span>Contraseña</span>
@@ -57,6 +52,7 @@ export default function LoginPage() {
               type="password"
               value={pass}
               onChange={(e) => setPass(e.target.value)}
+              required
               autoComplete="current-password"
               className="input"
             />

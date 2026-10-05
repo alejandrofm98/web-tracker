@@ -62,7 +62,7 @@ export default async function DetailPage({ params }: { params: { id: string } })
                   <>
                     {fmtMoney(web.clientPrice)} {web.billingPeriod === "mensual" ? "al mes" : "al año"} ·{" "}
                     {web.chargeStatus}
-                    {web.nextChargeAt ? ` · próximo ${fmtDate(web.nextChargeAt)} (${due(dCob)})` : ""}
+                    {web.nextChargeAt && web.chargeStatus === "pendiente" ? ` · próximo ${fmtDate(web.nextChargeAt)} (${due(dCob)})` : ""}
                   </>
                 )}
               </dd>

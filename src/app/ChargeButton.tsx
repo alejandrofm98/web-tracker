@@ -8,20 +8,29 @@ export default function ChargeButton({ id, compact }: { id: string; compact?: bo
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  const [error, setError] = useState("");
+
   async function mark() {
     setLoading(true);
-    await fetch(`/api/webs/${id}`, {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chargeStatus: "cobrado" }),
-    });
-    router.refresh();
-    setLoading(false);
+    setError("");
+    try {
+      const res = await fetch(`/api/webs/${id}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ chargeStatus: "cobrado" }),
+      });
+      if (!res.ok) throw new Error("No se pudo guardar");
+      router.refresh();
+    } catch {
+      setError("No se pudo guardar el cobro. Inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (compact) {
     return (
-      <button
+      <span className="charge-action"><button
         className="icon-btn accent"
         title="Marcar cobrado"
         aria-label="Marcar cobrado"
@@ -29,14 +38,14 @@ export default function ChargeButton({ id, compact }: { id: string; compact?: bo
         onClick={mark}
       >
         <Check size={15} />
-      </button>
+      </button>{error && <span role="alert" className="form-error">{error}</span>}</span>
     );
   }
 
   return (
-    <button className="btn-primary" disabled={loading} onClick={mark}>
+    <span className="charge-action"><button className="btn-primary" disabled={loading} onClick={mark}>
       <Check size={15} />
       {loading ? "Marcando…" : "Marcar cobrado"}
-    </button>
+    </button>{error && <span role="alert" className="form-error">{error}</span>}</span>
   );
 }

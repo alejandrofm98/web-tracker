@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hasApiAccess } from "@/lib/access";
 
-const DAY = 86400000;
+import { inventoryWhere, needsCompletion } from "@/lib/inventory";
 
 async function guard(req: Request) {
   if (!(await hasApiAccess(req))) {
@@ -18,31 +18,13 @@ export async function GET(req: Request) {
   const q = (searchParams.get("q") ?? "").trim();
   const f = searchParams.get("f") ?? "";
 
-  const where: Record<string, unknown> = {};
-  if (q) {
-    where.OR = [
-      { name: { contains: q, mode: "insensitive" } },
-      { url: { contains: q, mode: "insensitive" } },
-      { clientName: { contains: q, mode: "insensitive" } },
-    ];
-  }
-  if (f === "expiring") {
-    where.domainExpiresAt = { lte: new Date(Date.now() + 30 * DAY) };
-  } else if (f === "charges") {
-    where.chargeStatus = "pendiente";
-  } else if (f === "bajas") {
-    where.status = "baja";
-  } else if (f !== "todas" && f !== "") {
-    // filtro desconocido: ignorar
-  } else if (f === "") {
-    where.NOT = { status: "baja" };
-  }
+  const where = inventoryWhere(q, f);
 
   const webs = await prisma.website.findMany({
     where,
     orderBy: [{ domainExpiresAt: "asc" }, { nextChargeAt: "asc" }],
   });
-  return NextResponse.json(webs);
+  return NextResponse.json(f === "incomplete" ? webs.filter(needsCompletion) : webs);
 }
 
 export async function POST(req: Request) {

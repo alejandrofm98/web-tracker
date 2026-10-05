@@ -10,7 +10,7 @@ export default function TestNotifyButton() {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <button
-        className="icon-btn"
+        className="btn-ghost"
         title="Probar aviso"
         aria-label="Probar aviso"
         onClick={async () => {
@@ -28,9 +28,9 @@ export default function TestNotifyButton() {
         }}
         disabled={loading}
       >
-        <BellRing size={15} />
+        <BellRing size={15} /> {loading ? "Revisando…" : "Probar aviso"}
       </button>
-      {msg && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{msg}</span>}
+      {msg && <span role="status" style={{ fontSize: 12, color: "var(--text-muted)" }}>{msg}</span>}
     </span>
   );
 }
