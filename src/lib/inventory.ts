@@ -1,10 +1,10 @@
 import type { Prisma, Website } from "@prisma/client";
 import { daysUntil } from "./dates";
 
-type InventoryWeb = Pick<Website, "clientName" | "domainExpiresAt" | "clientPrice" | "chargeStatus" | "nextChargeAt">;
+type InventoryWeb = Pick<Website, "clientName" | "clientPrice" | "chargeStatus" | "nextChargeAt">;
 
 export function needsCompletion(web: InventoryWeb): boolean {
-  return !web.clientName.trim() || !web.domainExpiresAt ||
+  return (web.chargeStatus !== "sin-cobro" && !web.clientName.trim()) ||
     (web.chargeStatus !== "sin-cobro" && web.clientPrice === null) ||
     (web.chargeStatus === "pendiente" && !web.nextChargeAt);
 }

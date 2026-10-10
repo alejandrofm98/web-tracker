@@ -9,7 +9,7 @@ export async function register() {
       } catch (e) {
         console.error("cron diario error", e);
       }
-    });
+    }, { timezone: "Europe/Madrid" });
     console.log("cron diario registrado (09:00)");
   }
 }

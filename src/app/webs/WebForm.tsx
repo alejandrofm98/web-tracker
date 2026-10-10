@@ -100,7 +100,8 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
       </section>
 
       <section className="panel">
-        <h2 className="panel-title">Dominio</h2>
+        <h2 className="panel-title">Dominio (opcional)</h2>
+        <p className="cell-sub">Puedes dejarlo vacío si no gestionas el dominio. Si añades la caducidad, recibirás avisos.</p>
         <div className="form-grid">
           <label className="field">
             <span>Proveedor</span>

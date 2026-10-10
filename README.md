@@ -10,7 +10,8 @@ Panel personal para trackear webs, caducidad de dominios y cobros de hosting, co
    - `TELEGRAM_BOT_TOKEN`: token de @BotFather.
    - `TELEGRAM_CHAT_ID`: tu chat id (escríbele "hola" al bot y mira los
      mensajes con `https://api.telegram.org/botTU-TOKEN/getUpdates`).
-2. Los avisos saltan a 30 / 15 / 7 / 1 días antes de `dominioExpira` y `proximoCobro`.
+2. «Probar aviso» envía un mensaje de prueba a Telegram aunque no haya vencimientos próximos. Si falla, muestra el motivo del rechazo o la configuración que falta.
+3. Los avisos saltan a 30 / 15 / 7 / 1 días antes de `dominioExpira` y `proximoCobro`.
 
 ## Desarrollo local
 
@@ -133,13 +134,20 @@ curl -X PUT -H "$H" -H "content-type: application/json" $BASE/api/webs/ID \
   -d '{"chargeStatus": "cobrado"}'
 curl -X DELETE -H "$H" $BASE/api/webs/ID
 
+# Enviar un mensaje de prueba (no modifica los recordatorios)
+curl -X POST -H "$H" $BASE/api/cron
+
 # Disparar revisión de avisos (también vale Basic Auth del login)
 curl -H "$H" $BASE/api/cron
 ```
+
+Los datos del dominio son opcionales: dejar la caducidad vacía desactiva su
+seguimiento y no marca la ficha como incompleta. Para webs propias, selecciona
+«No se cobra»; no necesitan cliente ni fecha de cobro.
 
 ## Tests
 
 ```bash
 node --test tests/auth.test.mjs
-npx tsx --test tests/dates.test.ts tests/notify.test.ts
+npx tsx --test tests/*.test.ts
 ```

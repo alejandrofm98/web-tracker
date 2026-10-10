@@ -17,9 +17,9 @@ export default function TestNotifyButton() {
           setLoading(true);
           setMsg("");
           try {
-            const res = await fetch("/api/cron");
+            const res = await fetch("/api/cron", { method: "POST" });
             const data = await res.json().catch(() => ({}));
-            setMsg(res.ok ? `Revisadas ${data.checked}, avisos ${data.notified}` : "Error");
+            setMsg(res.ok ? "Mensaje de prueba enviado a Telegram" : data.error ?? "No se pudo enviar el aviso");
           } catch {
             setMsg("Error de conexión");
           } finally {
@@ -28,7 +28,7 @@ export default function TestNotifyButton() {
         }}
         disabled={loading}
       >
-        <BellRing size={15} /> {loading ? "Revisando…" : "Probar aviso"}
+        <BellRing size={15} /> {loading ? "Enviando…" : "Probar aviso"}
       </button>
       {msg && <span role="status" style={{ fontSize: 12, color: "var(--text-muted)" }}>{msg}</span>}
     </span>

@@ -55,7 +55,7 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
       {incomplete > 0 && (
         <aside className="inventory-notice">
           <Info size={17} aria-hidden="true" />
-          <p><strong>{incomplete === 1 ? "Hay una ficha por completar." : `Hay ${incomplete} fichas por completar.`}</strong> <span>Faltan datos de cliente, dominio o cobro.</span></p>
+          <p><strong>{incomplete === 1 ? "Hay una ficha por completar." : `Hay ${incomplete} fichas por completar.`}</strong> <span>Faltan datos de cliente o cobro.</span></p>
           <Link href="/?f=incomplete">Revisar fichas <ArrowUpRight size={14} /></Link>
         </aside>
       )}
@@ -76,12 +76,12 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
           <thead><tr>{["Web", "Cliente", "Proveedor", "Dominio", "Cobro", "Ficha"].map(label => <th key={label} scope="col">{label}</th>)}</tr></thead>
           <tbody>{webs.map(w => {
             const days = daysUntil(w.domainExpiresAt);
-            const domainTone = days === null ? "warning" : days < 7 ? "danger" : days < 30 ? "warning" : "success";
+            const domainTone = days === null ? "muted" : days < 7 ? "danger" : days < 30 ? "warning" : "success";
             return <tr key={w.id}>
               <th scope="row" className="inventory-web"><Link href={`/webs/${w.id}`}>{w.name}</Link><span className="inventory-secondary">{hostname(w.url)}{w.status === "baja" && <span className="inventory-inactive"> · Baja</span>}</span></th>
               <td data-label="Cliente" className={!w.clientName ? "muted" : ""}>{w.clientName || "Sin asignar"}</td>
-              <td data-label="Proveedor" className={!w.domainProvider ? "muted" : ""}>{w.domainProvider || "Sin registrar"}</td>
-              <td data-label="Dominio"><span className={days === null ? "tone-warning" : ""}>{days === null ? "Por completar" : fmtDate(w.domainExpiresAt)}</span><span className={`inventory-secondary tone-${domainTone}`}>{days === null ? "Falta la fecha" : domainLabel(days)}</span></td>
+              <td data-label="Proveedor" className={!w.domainProvider ? "muted" : ""}>{w.domainProvider || "Sin datos"}</td>
+              <td data-label="Dominio"><span className={days === null ? "muted" : ""}>{days === null ? "Sin seguimiento" : fmtDate(w.domainExpiresAt)}</span><span className={`inventory-secondary tone-${domainTone}`}>{days === null ? "Fecha opcional" : domainLabel(days)}</span></td>
               <td data-label="Cobro"><span>{w.chargeStatus === "sin-cobro" ? "Sin facturación" : w.clientPrice === null ? "Importe sin definir" : <>{fmtMoney(w.clientPrice)}<span className="muted"> /{w.billingPeriod === "mensual" ? "mes" : "año"}</span></>}</span><span className={`inventory-secondary tone-${w.chargeStatus === "cobrado" ? "success" : w.chargeStatus === "sin-cobro" ? "muted" : "warning"}`}>{chargeLabel(w)}</span>{w.chargeStatus === "pendiente" && <ChargeButton id={w.id} compact />}</td>
               <td className="inventory-open"><Link href={`/webs/${w.id}`} className="icon-btn" aria-label={`Abrir ficha de ${w.name}`} title="Abrir ficha"><ArrowUpRight size={17} /></Link></td>
             </tr>;

@@ -2,9 +2,9 @@ import { prisma } from "@/lib/db";
 import { daysUntil } from "@/lib/dates";
 import { dueIn } from "@/lib/notify";
 import { fmtDate, fmtMoney } from "@/lib/format";
-import { sendTelegram } from "@/lib/telegram";
+import { escapeTelegramHtml, sendTelegram } from "@/lib/telegram";
 
-export type CheckResult = { checked: number; notified: number; skippedNoTelegram: boolean };
+export type CheckResult = { checked: number; notified: number; skippedNoTelegram: boolean; error?: string };
 
 function startOfDay(d: Date): Date {
   const c = new Date(d);
@@ -26,18 +26,18 @@ export async function checkExpirations(now = new Date()): Promise<CheckResult> {
 
     if (dueIn(dDom) && dDom !== null) {
       const when = dDom === 0 ? "hoy" : `en ${dDom} días`;
-      msgs.push(`⚠️ <b>${w.name}</b> (${w.url}): el dominio caduca <b>${when}</b> (${fmtDate(w.domainExpiresAt)})`);
+      msgs.push(`⚠️ <b>${escapeTelegramHtml(w.name)}</b> (${escapeTelegramHtml(w.url)}): el dominio caduca <b>${when}</b> (${fmtDate(w.domainExpiresAt)})`);
     }
     if (w.chargeStatus === "pendiente" && dueIn(dCob) && dCob !== null) {
       const when = dCob === 0 ? "hoy" : `en ${dCob} días`;
       msgs.push(
-        `💰 <b>${w.name}</b>: toca cobrar hosting a ${w.clientName || "cliente"} (${fmtMoney(w.clientPrice)}) <b>${when}</b> (${fmtDate(w.nextChargeAt)})`
+        `💰 <b>${escapeTelegramHtml(w.name)}</b>: toca cobrar hosting a ${escapeTelegramHtml(w.clientName || "cliente")} (${fmtMoney(w.clientPrice)}) <b>${when}</b> (${fmtDate(w.nextChargeAt)})`
       );
     }
     if (msgs.length === 0) continue;
 
-    const ok = await sendTelegram(msgs.join("\n"));
-    if (!ok) return { checked: webs.length, notified, skippedNoTelegram: true };
+    const result = await sendTelegram(msgs.join("\n"));
+    if (!result.ok) return { checked: webs.length, notified, skippedNoTelegram: result.reason === "missing-config", error: result.error };
     await prisma.website.update({ where: { id: w.id }, data: { lastNotifiedAt: now } });
     notified++;
   }

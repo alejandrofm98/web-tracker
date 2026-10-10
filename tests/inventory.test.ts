@@ -7,9 +7,10 @@ test("un cobro pagado con fecha antigua no se muestra atrasado", () => {
   assert.equal(chargeLabel(complete), "Cobrado");
   assert.match(chargeLabel({ ...complete, chargeStatus: "pendiente" }), /retraso/);
 });
-test("una ficha sin fecha de dominio o datos de cobro está incompleta", () => {
+test("el dominio es opcional y los datos de cobro siguen siendo necesarios", () => {
   assert.equal(needsCompletion(complete), false);
-  assert.equal(needsCompletion({ ...complete, domainExpiresAt: null }), true);
+  const withoutDomain = { ...complete, domainExpiresAt: null };
+  assert.equal(needsCompletion(withoutDomain), false);
   assert.equal(needsCompletion({ ...complete, clientName: "  " }), true);
   assert.equal(needsCompletion({ ...complete, clientPrice: null }), true);
   assert.equal(needsCompletion({ ...complete, chargeStatus: "pendiente", nextChargeAt: null }), true);
@@ -22,4 +23,8 @@ test("búsqueda y filtro incompleto conservan las bajas fuera del listado", () =
   assert.equal(where.OR?.length, 3);
   assert.deepEqual(inventoryWhere("", "bajas"), { status: "baja" });
   assert.deepEqual(inventoryWhere("", "todas"), {});
+});
+
+test("una web propia sin cobro no necesita cliente, dominio ni próximo cobro", () => {
+  assert.equal(needsCompletion({ clientName: "", clientPrice: 0, chargeStatus: "sin-cobro", nextChargeAt: null }), false);
 });

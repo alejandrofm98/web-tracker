@@ -51,9 +51,15 @@ export default async function DetailPage({ params }: { params: { id: string } })
                     {web.domainCost != null ? ` · renueva ${fmtMoney(web.domainCost)}` : ""}
                   </>
                 ) : (
-                  "Sin fecha registrada"
+                  web.domainProvider ? `${web.domainProvider} · sin seguimiento de caducidad` : "Sin seguimiento de dominio (opcional)"
                 )}
               </dd>
+              {web.ownCost != null && (
+                <>
+                  <dt>Gasto propio</dt>
+                  <dd>{fmtMoney(web.ownCost)} {web.billingPeriod === "mensual" ? "al mes" : "al año"}</dd>
+                </>
+              )}
               <dt>Cobro</dt>
               <dd>
                 {web.chargeStatus === "sin-cobro" ? (
