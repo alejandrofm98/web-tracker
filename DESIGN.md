@@ -22,7 +22,11 @@ Los estados llevan texto además del color. Una fecha de dominio ausente se mues
 Inter local para títulos, controles, datos y textos. Titular 30px, peso 600; cuerpo 14px; tabla 13px; textos secundarios 12px. No se necesita tipografía display en la interfaz. Fuentes locales, sin descarga externa durante el build.
 
 ## Layout
-Contenido centrado de hasta 1160px útiles. Cabecera Webs/Cobros y acción Nueva web. Resumen en línea, aviso único de fichas incompletas, filtros y búsqueda antes de la tabla. Columnas: Web, Cliente, Proveedor, Dominio, Cobro, Ficha.
+Contenido centrado de hasta 1160px útiles. Cabecera Webs/Cobros/Estadísticas/Ajustes y acción Nueva web. Resumen en línea con importe pendiente, aviso único de fichas incompletas, filtros y búsqueda antes de la tabla. Columnas: Web, Cliente, Proveedor, Dominio, Cobro, Ficha.
+
+Estadísticas usa un resumen de cuotas anuales previstas, cobros pendientes y costes por renovación, con divisores simples. La previsión muestra barras por mes para las fechas pendientes registradas, sin inferir renovaciones. Un estado vacío invita a completar fechas. Los importes incompletos se indican expresamente; no se presenta beneficio ni historial de ingresos cobrados.
+
+Ajustes organiza horario, dominios y cobros en secciones abiertas, con etiquetas a la izquierda y controles a la derecha en escritorio. Resumen antes de guardar, errores inline y conexión de Telegram aparte. En móvil, navegación en una segunda fila y secciones apiladas. Hora de Madrid y antelaciones independientes, con 0 para incluir el vencimiento.
 
 En móvil cada fila se reorganiza en una cuadrícula: nombre y acceso, cliente/proveedor, dominio/cobro. Se conservan todos los datos sin desplazamiento horizontal. Los formularios mantienen sus secciones y las acciones de guardar/cancelar. Login centrado y breve.
 

@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       stack: String(body.stack ?? ""),
       repoUrl: String(body.repoUrl ?? ""),
       credentialsHint: String(body.credentialsHint ?? ""),
+      envHint: String(body.envHint ?? ""),
       notes: String(body.notes ?? ""),
     },
   });

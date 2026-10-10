@@ -2,14 +2,19 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     const { default: cron } = await import("node-cron");
     const { checkExpirations } = await import("@/lib/check");
-    cron.schedule("0 9 * * *", async () => {
+    const { getNotificationSettings } = await import("@/lib/settings");
+    const { isNotificationTime } = await import("@/lib/notification-settings");
+    cron.schedule("* * * * *", async () => {
       try {
-        const r = await checkExpirations();
+        const now = new Date();
+        const settings = await getNotificationSettings();
+        if (!isNotificationTime(settings, now)) return;
+        const r = await checkExpirations(now, settings);
         console.log("cron diario", JSON.stringify(r));
       } catch (e) {
         console.error("cron diario error", e);
       }
-    }, { timezone: "Europe/Madrid" });
-    console.log("cron diario registrado (09:00)");
+    }, { timezone: "Europe/Madrid", noOverlap: true });
+    console.log("Avisos registrados: horario configurable en Ajustes (Europe/Madrid)");
   }
 }

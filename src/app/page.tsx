@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { daysUntil } from "@/lib/dates";
 import { fmtDate, fmtMoney } from "@/lib/format";
 import { chargeLabel, inventoryWhere, needsCompletion } from "@/lib/inventory";
+import { portfolioStatistics } from "@/lib/statistics";
 import Shell from "./Shell";
 import TestNotifyButton from "./TestNotifyButton";
 import ChargeButton from "./ChargeButton";
@@ -30,6 +31,7 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
   ]);
   const webs = f === "incomplete" ? results.filter(needsCompletion) : results;
   const incomplete = portfolio.filter(needsCompletion).length;
+  const stats = portfolioStatistics(portfolio);
   const hrefFor = (value: string) => {
     const params = new URLSearchParams();
     if (value) params.set("f", value);
@@ -41,15 +43,16 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
       <div className="inventory-heading">
         <div>
           <p className="ed-kicker">Tu cartera de webs</p>
-          <h1 className="ed-title">Todo a la vista.</h1>
-          <p className="inventory-subtitle">Dominios, clientes y cobros en un mismo lugar.</p>
+          <h1 className="ed-title">{f === "charges" ? "Cobros pendientes" : "Tus webs"}</h1>
+          <p className="inventory-subtitle">{f === "charges" ? "Cuotas de dominio y hosting pendientes de cobrar al cliente." : "Dominios, clientes y próximas renovaciones."}</p>
         </div>
         <Link href="/webs/nueva" className="btn-primary"><Plus size={16} /> Nueva web</Link>
       </div>
       <div className="inventory-summary" aria-label="Resumen de la cartera">
         <span><i className="status-dot" />{portfolio.length} webs activas</span>
         <span>{portfolio.filter(w => w.domainExpiresAt).length} dominios con fecha</span>
-        <span>{portfolio.filter(w => w.chargeStatus === "cobrado").length} cobros resueltos</span>
+        <Link href="/?f=charges">{fmtMoney(stats.pendingAmount)} pendientes{stats.overdueCount > 0 ? ` · ${stats.overdueCount} atrasados` : ""}</Link>
+        <Link href="/estadisticas">Ver estadísticas <ArrowUpRight size={13} /></Link>
         <time dateTime={new Date().toISOString().slice(0, 10)}>{new Date().toLocaleDateString("es-ES", { day: "numeric", month: "long", timeZone: "Europe/Madrid" })}</time>
       </div>
       {incomplete > 0 && (

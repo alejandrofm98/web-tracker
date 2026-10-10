@@ -1,6 +1,6 @@
 # Web Tracker
 
-Panel personal para trackear webs, caducidad de dominios y cobros de hosting, con avisos en Telegram.
+Panel personal para trackear webs, caducidad de dominios y cuotas de dominio y hosting al cliente, con avisos en Telegram.
 
 ## Configuración
 
@@ -11,7 +11,14 @@ Panel personal para trackear webs, caducidad de dominios y cobros de hosting, co
    - `TELEGRAM_CHAT_ID`: tu chat id (escríbele "hola" al bot y mira los
      mensajes con `https://api.telegram.org/botTU-TOKEN/getUpdates`).
 2. «Probar aviso» envía un mensaje de prueba a Telegram aunque no haya vencimientos próximos. Si falla, muestra el motivo del rechazo o la configuración que falta.
-3. Los avisos saltan a 30 / 15 / 7 / 1 días antes de `dominioExpira` y `proximoCobro`.
+3. En **Ajustes** puedes pausar los avisos, elegir la hora diaria de revisión
+   (Europe/Madrid) y configurar los días de antelación para dominios y cobros
+   por separado. Por defecto: 09:00 y 30 / 15 / 7 / 1 días. Añade 0 para avisar
+   el mismo día del vencimiento. No se repiten avisos después del vencimiento.
+   Los cambios se guardan en Postgres y se aplican sin reiniciar la app.
+4. **Estadísticas** muestra cuotas anuales previstas, cobros pendientes,
+   costes de renovación de dominios y próximas fechas registradas. No es un
+   historial de ingresos cobrados ni un cálculo de beneficio.
 
 ## Desarrollo local
 
@@ -60,9 +67,12 @@ docker compose up -d --build
    devuelve 503 si no puede conectar con Postgres.
 7. Comprueba `/login`, inicia sesión y revisa `/api/webs` con tu token. Sin
    credenciales `/api/webs` debe devolver 401, no 404.
-8. El cron diario corre a las 09:00 de Europe/Madrid. Alternativamente puedes
+8. El cron revisa cada minuto el horario guardado en Ajustes y ejecuta la
+   revisión de vencimientos una vez al día a la hora seleccionada (09:00 por
+   defecto, Europe/Madrid). La app debe estar en marcha a esa hora. Alternativamente puedes
    configurar un cron que llame a `/api/cron` usando Bearer o Basic Auth.
-   Esa llamada puede enviar avisos a Telegram.
+   Esa llamada revisa los vencimientos inmediatamente, respeta la pausa y los
+   días de antelación configurados, y puede enviar avisos a Telegram.
 
 Las fuentes están incluidas en `src/app/fonts` con sus licencias OFL. El build
 no necesita descargar fuentes de Google.
@@ -144,6 +154,20 @@ curl -H "$H" $BASE/api/cron
 Los datos del dominio son opcionales: dejar la caducidad vacía desactiva su
 seguimiento y no marca la ficha como incompleta. Para webs propias, selecciona
 «No se cobra»; no necesitan cliente ni fecha de cobro.
+
+## Ubicación de accesos y configuración
+
+Cada ficha admite varios **Repositorios**, con una URL por línea (el campo
+`repoUrl` de la API conserva su nombre y admite saltos de línea).
+En **Credenciales en Bitwarden**, indica la colección o carpeta y los nombres
+exactos de las entradas para panel, base de datos y otros servicios.
+En **Dónde está el .env y la configuración** (`envHint` en la API), indica las
+rutas locales, la ubicación de las variables en producción y el nombre de la
+nota o adjunto de Bitwarden que contiene la copia. Estos campos guardan
+referencias, nunca el contenido del `.env`, contraseñas ni tokens.
+Los enlaces HTTP/HTTPS de ambos campos son clicables en la ficha. Para obtener
+el enlace de Bitwarden, abre el elemento en su bóveda web y copia la URL completa
+de la barra de direcciones. Necesitas iniciar sesión y tener acceso a la entrada.
 
 ## Tests
 

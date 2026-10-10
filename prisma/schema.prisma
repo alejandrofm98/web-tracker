@@ -7,6 +7,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model NotificationSettings {
+  id             Int      @id @default(1)
+  enabled        Boolean  @default(true)
+  sendTime       String   @default("09:00")
+  domainEnabled  Boolean  @default(true)
+  chargeEnabled  Boolean  @default(true)
+  domainDays     Int[]    @default([30, 15, 7, 1])
+  chargeDays     Int[]    @default([30, 15, 7, 1])
+  updatedAt      DateTime @updatedAt
+}
+
 model Website {
   id               String    @id @default(cuid())
   name             String
@@ -28,6 +39,7 @@ model Website {
   stack            String    @default("")
   repoUrl          String    @default("")
   credentialsHint  String    @default("")
+  envHint          String    @default("")
   notes            String    @default("")
   lastNotifiedAt   DateTime?
   createdAt        DateTime  @default(now())

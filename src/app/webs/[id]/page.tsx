@@ -6,6 +6,7 @@ import { daysUntil } from "@/lib/dates";
 import { fmtDate, fmtMoney } from "@/lib/format";
 import Shell from "../../Shell";
 import WebForm from "../WebForm";
+import TechnicalLocation from "../TechnicalLocation";
 import DeleteButton from "./DeleteButton";
 import ChargeButton from "../../ChargeButton";
 
@@ -54,19 +55,19 @@ export default async function DetailPage({ params }: { params: { id: string } })
                   web.domainProvider ? `${web.domainProvider} · sin seguimiento de caducidad` : "Sin seguimiento de dominio (opcional)"
                 )}
               </dd>
-              {web.ownCost != null && (
-                <>
-                  <dt>Gasto propio</dt>
-                  <dd>{fmtMoney(web.ownCost)} {web.billingPeriod === "mensual" ? "al mes" : "al año"}</dd>
-                </>
-              )}
-              <dt>Cobro</dt>
+              <dt>Hosting</dt>
+              <dd>
+                {web.hostingProvider || "Proveedor sin indicar"}
+                {web.hostingPlan ? ` · ${web.hostingPlan}` : ""}
+                {web.ownCost != null ? ` · coste para ti: ${fmtMoney(web.ownCost)}` : ""}
+              </dd>
+              <dt>Cobro al cliente</dt>
               <dd>
                 {web.chargeStatus === "sin-cobro" ? (
                   "No se cobra"
                 ) : (
                   <>
-                    {fmtMoney(web.clientPrice)} {web.billingPeriod === "mensual" ? "al mes" : "al año"} ·{" "}
+                    {fmtMoney(web.clientPrice)} {web.billingPeriod === "mensual" ? "al mes" : "al año"} por dominio y hosting ·{" "}
                     {web.chargeStatus}
                     {web.nextChargeAt && web.chargeStatus === "pendiente" ? ` · próximo ${fmtDate(web.nextChargeAt)} (${due(dCob)})` : ""}
                   </>
@@ -84,6 +85,22 @@ export default async function DetailPage({ params }: { params: { id: string } })
                   <dd>{web.notes}</dd>
                 </>
               )}
+              {web.repoUrl && (
+                <>
+                  <dt>Repositorios</dt>
+                  <dd>
+                    {web.repoUrl.split(/\r?\n/).map((repo) => repo.trim()).filter(Boolean).map((repo, index) => (
+                      <div key={index} className="technical-location">
+                        {/^https?:\/\//i.test(repo) ? <a href={repo} target="_blank" rel="noreferrer">{repo}</a> : repo}
+                      </div>
+                    ))}
+                  </dd>
+                </>
+              )}
+              <dt>Credenciales en Bitwarden</dt>
+              <TechnicalLocation value={web.credentialsHint || "Pendiente de indicar la colección y las entradas de Bitwarden."} />
+              <dt>.env y configuración</dt>
+              <TechnicalLocation value={web.envHint || "Pendiente de indicar la ruta local, la configuración de producción y la copia en Bitwarden."} />
             </dl>
           </div>
           <div className="ficha-side">

@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     "name", "url", "clientName", "clientContact", "status",
     "domainProvider", "hostingProvider", "hostingPlan",
     "billingPeriod", "chargeStatus", "stack", "repoUrl",
-    "credentialsHint", "notes",
+    "credentialsHint", "envHint", "notes",
   ]) {
     if (body[k] !== undefined) data[k] = String(body[k]);
   }

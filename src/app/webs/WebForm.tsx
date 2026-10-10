@@ -25,6 +25,7 @@ export type WebInitial = {
   stack?: string;
   repoUrl?: string;
   credentialsHint?: string;
+  envHint?: string;
   notes?: string;
 };
 
@@ -117,7 +118,7 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
             />
           </label>
           <label className="field">
-            <span>Coste renovación (€)</span>
+            <span>Coste del dominio para ti (€ por renovación)</span>
             <input
               type="number"
               step="0.01"
@@ -134,7 +135,8 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
       </section>
 
       <section className="panel">
-        <h2 className="panel-title">Hosting y cobros</h2>
+        <h2 className="panel-title">Hosting</h2>
+        <p className="cell-sub">Proveedor, plan y coste para ti. Si el hosting es gratis, indica 0 €.</p>
         <div className="form-grid">
           <label className="field">
             <span>Proveedor hosting</span>
@@ -145,25 +147,32 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
             <input name="hostingPlan" defaultValue={v("hostingPlan")} className="input" />
           </label>
           <label className="field">
+            <span>Coste de hosting para ti (€)</span>
+            <input type="number" step="0.01" name="ownCost" defaultValue={initial?.ownCost ?? (isEdit ? "" : 0)} className="input" />
+          </label>
+        </div>
+      </section>
+
+      <section className="panel">
+        <h2 className="panel-title">Cobros al cliente</h2>
+        <p className="cell-sub">Cuota por dominio y hosting. La fecha de cobro es independiente de la renovación del dominio.</p>
+        <div className="form-grid">
+          <label className="field">
+            <span>Cuota al cliente (€)</span>
+            <input
+              type="number"
+              step="0.01"
+              name="clientPrice"
+              defaultValue={initial?.clientPrice ?? (isEdit ? "" : 50)}
+              className="input"
+            />
+          </label>
+          <label className="field">
             <span>Periodicidad</span>
             <select name="billingPeriod" defaultValue={v("billingPeriod", "anual")} className="input">
               <option value="mensual">mensual</option>
               <option value="anual">anual</option>
             </select>
-          </label>
-          <label className="field">
-            <span>Me cuesta (€)</span>
-            <input type="number" step="0.01" name="ownCost" defaultValue={initial?.ownCost ?? ""} className="input" />
-          </label>
-          <label className="field">
-            <span>Le cobro (€)</span>
-            <input
-              type="number"
-              step="0.01"
-              name="clientPrice"
-              defaultValue={initial?.clientPrice ?? ""}
-              className="input"
-            />
           </label>
           <label className="field">
             <span>Próximo cobro</span>
@@ -192,20 +201,22 @@ export default function WebForm({ initial }: { initial?: WebInitial }) {
             <span>Stack</span>
             <input name="stack" defaultValue={v("stack")} className="input" />
           </label>
-          <label className="field">
-            <span>Repo</span>
-            <input name="repoUrl" defaultValue={v("repoUrl")} placeholder="https://…" className="input" />
-          </label>
-          <label className="field">
-            <span>Dónde están las credenciales</span>
-            <input
-              name="credentialsHint"
-              defaultValue={v("credentialsHint")}
-              placeholder="Pista, nunca passwords"
-              className="input"
-            />
-          </label>
         </div>
+        <label className="field technical-field">
+          <span>Repositorios</span>
+          <textarea name="repoUrl" defaultValue={v("repoUrl")} rows={3} placeholder={"https://github.com/organizacion/frontend\nhttps://github.com/organizacion/backend"} aria-describedby="repos-help" className="input" />
+          <small id="repos-help" className="cell-sub">Una URL por línea. Puedes añadir frontend, backend y otros repositorios.</small>
+        </label>
+        <label className="field technical-field">
+          <span>Credenciales en Bitwarden</span>
+          <textarea name="credentialsHint" defaultValue={v("credentialsHint")} rows={3} placeholder={"Colección o carpeta: …\nEntrada: …\nAcceso: panel, base de datos, correo…"} aria-describedby="credentials-help" className="input" />
+          <small id="credentials-help" className="cell-sub">Indica la colección o carpeta y el nombre exacto de cada entrada. Para enlazarla, abre el elemento en la bóveda web de Bitwarden y pega aquí la URL completa: será clicable en la ficha. Sin contraseñas ni tokens.</small>
+        </label>
+        <label className="field technical-field">
+          <span>Dónde está el .env y la configuración</span>
+          <textarea name="envHint" defaultValue={v("envHint")} rows={3} placeholder={"Local: /ruta/al/proyecto/.env.local\nProducción: servicio → Environment\nCopia en Bitwarden: nombre de la nota o adjunto"} aria-describedby="env-help" className="input" />
+          <small id="env-help" className="cell-sub">Indica la ruta por entorno y la carpeta o colección, entrada y adjunto del .env en Bitwarden. Puedes pegar el enlace de la entrada. No pegues el contenido del archivo.</small>
+        </label>
         <label className="field" style={{ display: "block", marginTop: 12 }}>
           <span>Notas</span>
           <textarea name="notes" defaultValue={v("notes")} rows={4} className="input" />
