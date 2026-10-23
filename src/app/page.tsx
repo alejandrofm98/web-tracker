@@ -22,9 +22,10 @@ function domainLabel(days: number) {
   return `Quedan ${days} días`;
 }
 
-export default async function Home({ searchParams }: { searchParams: { q?: string; f?: string } }) {
-  const q = (searchParams.q ?? "").trim();
-  const f = FILTERS.some(([value]) => value === searchParams.f) ? searchParams.f ?? "" : "";
+export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; f?: string }> }) {
+  const query = await searchParams;
+  const q = (query.q ?? "").trim();
+  const f = FILTERS.some(([value]) => value === query.f) ? query.f ?? "" : "";
   const [results, portfolio] = await Promise.all([
     prisma.website.findMany({ where: inventoryWhere(q, f), orderBy: [{ domainExpiresAt: "asc" }, { name: "asc" }] }),
     prisma.website.findMany({ where: { NOT: { status: "baja" } } }),

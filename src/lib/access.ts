@@ -25,7 +25,7 @@ export function hasBasicAuth(req: Request): boolean {
 }
 
 export async function hasSession(): Promise<boolean> {
-  const token = cookies().get(SESSION_COOKIE)?.value;
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return false;
   try {
     await verifySession(token);

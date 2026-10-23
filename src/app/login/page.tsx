@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
   return (
     <main className="login-wrap">
-      <a className="brand login-brand" href="/" style={{ color: "var(--text)" }}><span className="brand-mark">W</span><span className="brand-name">Web Tracker</span></a>
+      <Link className="brand login-brand" href="/" style={{ color: "var(--text)" }}><span className="brand-mark">W</span><span className="brand-name">Web Tracker</span></Link>
       <div className="login-right">
         <form onSubmit={onSubmit} className="login-card">
           <p className="ed-kicker">Tu espacio privado</p>

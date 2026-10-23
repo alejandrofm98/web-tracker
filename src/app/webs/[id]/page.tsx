@@ -19,8 +19,9 @@ function due(days: number | null): string {
   return `quedan ${days}d`;
 }
 
-export default async function DetailPage({ params }: { params: { id: string } }) {
-  const web = await prisma.website.findUnique({ where: { id: params.id } });
+export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const web = await prisma.website.findUnique({ where: { id } });
   if (!web) notFound();
 
   const dDom = daysUntil(web.domainExpiresAt);

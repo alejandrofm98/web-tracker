@@ -6,25 +6,25 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "jose": "^6.2.12",
     "lucide-react": "^1.43.0",
-    "next": "14.2.35",
+    "next": "16.4.2",
     "node-cron": "^4.6.0",
     "prisma": "^5.22.0",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/node-cron": "^3.0.11",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.35",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.13.0",
+    "eslint-config-next": "16.4.2",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.13",
